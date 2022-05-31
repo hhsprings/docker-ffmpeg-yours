@@ -112,7 +112,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-gpl \
     --enable-version3 \
     \
-    --enable-lzma --enable-zlib --enable-iconv \
+    --enable-lzma --enable-zlib \
     \
     --enable-libsrt \
     \
