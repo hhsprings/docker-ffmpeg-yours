@@ -1,5 +1,5 @@
 # docker-ffmpeg-yours
-Ffmpeg on docker for you. [ffmpeg-yours-min](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours-min), and [ffmpeg-yours](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours) are created by this.
+Ffmpeg on docker for you. [ffmpeg-yours-min](https://hub.docker.com/r/hhsprings/ffmpeg-yours-min), and [ffmpeg-yours](https://hub.docker.com/r/hhsprings/ffmpeg-yours) are created by this.
 
 The purpose of this project is not to provide off-the-shelf products, but to "provide a template for you to create ffmpeg (on docker) for yourself".
 
@@ -35,7 +35,7 @@ There are two ways of thinking.
 
 One thing is to simply copy the Dockerfile to your PC and edit it as you like. You might think it's a silly approach, but it's not wrong. My Dockerfile may be "overkill", so just get rid of what you think you don't need.
 
-The other is to take over [ffmpeg-yours-min](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours-min), or [ffmpeg-yours](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours) by [FROM](https://docs.docker.com/engine/reference/builder/#from) in your Dockerfile.
+The other is to take over [ffmpeg-yours-min](https://hub.docker.com/r/hhsprings/ffmpeg-yours-min), or [ffmpeg-yours](https://hub.docker.com/r/hhsprings/ffmpeg-yours) by [FROM](https://docs.docker.com/engine/reference/builder/#from) in your Dockerfile.
 
 ```Dockerfile
 FROM hhsprings/ffmpeg-yours
