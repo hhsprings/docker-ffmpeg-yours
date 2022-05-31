@@ -115,7 +115,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-lzma --enable-zlib --enable-iconv \
     \
     --enable-libsrt \
-    --enable-libxml2 \
     \
     --enable-libssh \
     --enable-gnutls \
