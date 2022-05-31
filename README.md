@@ -57,6 +57,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
 ```
-As mentioned above, the source tree, intermediate files, etc. are all preserved, so you may want to clean them up.
+As mentioned above, the source tree, intermediate files, etc. are all left unerased, so you may want to clean them up.
 
 By the way, you can easily see the difference between /ffmpeg-yours and /ffmpeg-yours-min by reading my Dockerfile.
