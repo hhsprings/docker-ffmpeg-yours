@@ -30,7 +30,11 @@ WORKDIR ${OPENCV_SRCDIR}
 RUN mkdir build
 WORKDIR ${OPENCV_SRCDIR}/build
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
-RUN cmake -D CMAKE_BUILD_TYPE=RELEASE -D OPENCV_GENERATE_PKGCONFIG=ON -D CMAKE_INSTALL_PREFIX=${_PREFIX} ..
+RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D OPENCV_GENERATE_PKGCONFIG=ON \
+    -D BUILD_TESTS=OFF \
+    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
+    ..
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
 
