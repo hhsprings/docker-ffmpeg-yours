@@ -29,3 +29,34 @@ Note that even if it is built, there are some that cannot be used with this sing
 For example, the RTMP protocol is enabled (--enable-rtmp), but you'll need to get help from something else, such as the nginx server.
 There are many others that I have enabled without knowing if it works or what I should do to make it work.
 Rather, they could be used to study "how to get them to work with Docker".
+
+### If you want to create your own container based on this
+There are two ways of thinking.
+
+One thing is to simply copy the Dockerfile to your PC and edit it as you like. You might think it's a silly approach, but it's not wrong. My Dockerfile may be "overkill", so just get rid of what you think you don't need.
+
+The other is to take over [ffmpeg-yours-min](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours-min), or [ffmpeg-yours-min](https://hub.docker.com/repository/docker/hhsprings/ffmpeg-yours-min) by [FROM](https://docs.docker.com/engine/reference/builder/#from) in your Dockerfile.
+
+```Dockerfile
+FROM hhsprings/ffmpeg-yours
+
+# Your container keeps the source of ffmpeg built by hhsprings/ffmpeg-yours
+# and all the intermediate files at build time. You can reach the source
+# tree with the environment variable FFMPEG_SRCDIR.
+WORKDIR ${FFMPEG_SRCDIR}
+
+# Install dependencies for any features you want to enable. (For example, TensorFlow.)
+RUN apt-get install -yq --no-install-recommends libFUBAR-dev
+
+# Reuse the configure option in my build and rerun configure.
+RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
+        sed "s@--extra-version=[^\s][^\s]*@--extra-version=yourbuild0.1@"` \
+        --enable-FUBAR
+
+# Build and install.
+RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
+RUN make install
+```
+As mentioned above, the source tree, intermediate files, etc. are all preserved, so you may want to clean them up.
+
+By the way, you can easily see the difference between /ffmpeg-yours and /ffmpeg-yours-min by reading my Dockerfile.
