@@ -57,6 +57,7 @@ RUN sh configure \
     --enable-shared \
     --enable-pthreads \
     \
+    --enable-iconv \
     --enable-libass \
     --enable-libfribidi \
     --enable-libfontconfig \
