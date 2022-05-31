@@ -61,6 +61,7 @@ RUN sh configure \
     --enable-libfribidi \
     --enable-libfontconfig \
     --enable-libfreetype \
+    --enable-libxml2 \
     \
     --disable-ffplay \
     --disable-doc \
