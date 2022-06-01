@@ -42,7 +42,7 @@ RUN apt-get install ${__APT_Y} libfreetype-dev
 # download specific released version, not current snapshot via git.
 ADD https://ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz .
 
-RUN tar Jxvf ffmpeg-${_FFMPEG_VERSION}.tar.xz
+RUN tar Jxvf ffmpeg-${_FFMPEG_VERSION}.tar.xz && rm -fv ffmpeg-${_FFMPEG_VERSION}.tar.xz
 ENV FFMPEG_SRCDIR=/tmp/build/ffmpeg-${_FFMPEG_VERSION}
 WORKDIR ${FFMPEG_SRCDIR}
 
