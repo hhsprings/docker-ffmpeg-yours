@@ -1,9 +1,9 @@
 #
-ARG _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG:-22.04}
+ARG _BUILDPACKDEPS_TAG=22.04
 FROM hhsprings/buildpack-deps-plus:latest-from-${_BUILDPACKDEPS_TAG}
-ARG _FFMPEG_VERSION=${_FFMPEG_VERSION:-4.4.2}
+ARG _FFMPEG_VERSION=4.4.2
 ARG _PREFIX=/usr/local
-ARG _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX:-hhsprings0.1-min}
+ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1-min
 ARG __APT_Y="-yq --no-install-recommends"
 #
 WORKDIR /tmp/build
@@ -73,3 +73,13 @@ RUN sh configure \
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
+
+# ----------------------------------------------------------
+#
+# Cleanup apt-related.
+# It was intended not to erase the traces of my own build.
+# (This is so that the container inherited by FROM can use
+# it as it is.)
+#
+# ----------------------------------------------------------
+RUN rm -rf /var/lib/apt/lists/*
