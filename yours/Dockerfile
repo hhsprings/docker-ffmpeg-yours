@@ -23,7 +23,7 @@ WORKDIR /tmp/build
 # download specific released version, not current snapshot via git.
 ADD https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz .
 
-RUN tar zxvf ${_OPENCV_VERSION}.tar.gz
+RUN tar zxvf ${_OPENCV_VERSION}.tar.gz && rm -fv ${_OPENCV_VERSION}.tar.gz
 ENV OPENCV_SRCDIR=/tmp/build/opencv-${_OPENCV_VERSION}
 WORKDIR ${OPENCV_SRCDIR}
 RUN mkdir build
