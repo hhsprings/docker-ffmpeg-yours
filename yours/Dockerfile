@@ -1,11 +1,10 @@
 #
-ARG _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG:-22.04}
-ARG _FFMPEG_VERSION=${_FFMPEG_VERSION:-4.4.2}
-ARG _VER_MIN=${_VER_MIN:-0.1}
-FROM hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-ARG _OPENCV_VERSION=${_OPENCV_VERSION:-3.4.15}
+ARG _BUILDPACKDEPS_TAG=22.04
+ARG _FFMPEG_VERSION=4.4.2
+FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+ARG _OPENCV_VERSION=3.4.15
 ARG _PREFIX=/usr/local
-ARG _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX:-hhsprings0.1}
+ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG __APT_Y="-yq --no-install-recommends"
 #
 RUN apt-get update && \
@@ -180,3 +179,13 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
 # -------------------------------------------------------
+
+# ----------------------------------------------------------
+#
+# Cleanup apt-related.
+# It was intended not to erase the traces of my own build.
+# (This is so that the container inherited by FROM can use
+# it as it is.)
+#
+# ----------------------------------------------------------
+RUN rm -rf /var/lib/apt/lists/*
