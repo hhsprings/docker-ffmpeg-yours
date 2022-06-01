@@ -16,6 +16,9 @@ export _OPENCV_VERSION=3.4.15
     docker tag \
            ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
            ${_YOU}/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+    docker tag \
+           ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
+           ${_YOU}/ffmpeg-yours-min:latest
 ) && \
 (
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
@@ -26,4 +29,7 @@ export _OPENCV_VERSION=3.4.15
            --build-arg _OPENCV_VERSION=${_OPENCV_VERSION} \
            --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX} \
            .
+    docker tag \
+           ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_OPENCV_VERSION}-${_BUILDPACKDEPS_TAG} \
+           ${_YOU}/ffmpeg-yours:latest
 )
