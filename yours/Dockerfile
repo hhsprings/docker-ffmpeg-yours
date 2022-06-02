@@ -44,7 +44,7 @@ RUN make install
 #
 # ----------------------------------------------------------
 #
-RUN touch _enable_if_available
+RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
 #
 RUN apt-get install ${__APT_Y} libssh-dev
 RUN apt-get install ${__APT_Y} libgnutls28-dev
@@ -106,8 +106,8 @@ RUN apt-get install ${__APT_Y} libxavs2-dev
 RUN apt-get install ${__APT_Y} liblilv-dev
 RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
-         echo --enable-librist >> _enable_if_available ; \
-     fi)
+         echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 
 # ----------------------------------------------------------
 #
