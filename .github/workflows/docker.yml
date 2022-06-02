@@ -1,11 +1,8 @@
 name: integrate to DockerHub
 
 # Controls when the workflow will run
-on: [push]
-#on:
-#  check_run:
-#    types:
-#      - requested
+#on: [push]
+on: workflow_dispatch
 
 jobs:
   build:
