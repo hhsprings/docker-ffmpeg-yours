@@ -10,10 +10,20 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: docker build
+      - name: docker build ffmpeg-yours-min
         run: >
-          docker build -t hhsprings/ffmpeg-yours-min
-          --build-arg _BUILDPACKDEPS_TAG=22.04
+          docker build -t hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
+          --build-arg _BUILDPACKDEPS_TAG=22.10
           --build-arg _FFMPEG_VERSION=4.4.2
-          --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.2
+          --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.3-min
           min
+
+      - name: docker tag ffmpeg-yours-min:latest
+        run: >
+          docker tag
+          hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
+          hhsprings/ffmpeg-yours-min:latest-4.4.2-22.10
+          ;
+          docker tag
+          hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
+          hhsprings/ffmpeg-yours-min:latest
