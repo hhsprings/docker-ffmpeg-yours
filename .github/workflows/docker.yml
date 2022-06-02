@@ -1,0 +1,19 @@
+name: integrate to DockerHub
+
+# Controls when the workflow will run
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: docker build
+        run: |
+          docker build -t hhsprings/ffmpeg-yours-min \
+          --build-arg _BUILDPACKDEPS_TAG=22.04 \
+          --build-arg _FFMPEG_VERSION=4.4.2 
+          --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.2 \
+          min
