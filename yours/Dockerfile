@@ -44,6 +44,8 @@ RUN make install
 #
 # ----------------------------------------------------------
 #
+RUN touch _enable_if_available
+#
 RUN apt-get install ${__APT_Y} libssh-dev
 RUN apt-get install ${__APT_Y} libgnutls28-dev
 RUN apt-get install ${__APT_Y} nvidia-opencl-dev
@@ -102,6 +104,10 @@ RUN apt-get install ${__APT_Y} libdrm-dev
 RUN apt-get install ${__APT_Y} librtmp-dev
 RUN apt-get install ${__APT_Y} libxavs2-dev
 RUN apt-get install ${__APT_Y} liblilv-dev
+RUN (\
+     if apt-get install ${__APT_Y} librist-dev ; then \
+         echo --enable-librist >> _enable_if_available ; \
+     fi)
 
 # ----------------------------------------------------------
 #
@@ -114,8 +120,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
         sed "s@--extra-version=[^\s][^\s]*@--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX}@"` \
     --enable-gpl \
     --enable-version3 \
-    \
-    --enable-lzma --enable-zlib \
     \
     --enable-libsrt \
     \
@@ -172,6 +176,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-librtmp \
     --enable-libxavs2 \
     --enable-lv2 \
+    $(cat _enable_if_available) \
     \
     --enable-opencl \
     --enable-libopencv
