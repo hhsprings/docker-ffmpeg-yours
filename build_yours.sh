@@ -1,7 +1,6 @@
 #! /bin/sh
 export __dopush=$(test "z${1}" = "z--push" && echo 1)
 export _YOU=${_YOU:-hhsprings}
-export _VER_MIN=0.3
 export _VER_YOURS=0.3
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
