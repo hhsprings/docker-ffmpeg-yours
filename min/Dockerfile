@@ -33,6 +33,10 @@ RUN apt-get update && \
 # products, but to "provide a template for you to create ffmpeg
 # for yourself".
 #
+# By the way, I have specified some auto-discovered options (lzma,
+# zlib, etc.) for clarity. Setting "--enable-" for something that
+# is detected as "available" by auto-discovery has no effect on
+# the execution of the final FFMPEG other than the banner output.
 # ----------------------------------------------------------
 RUN apt-get install ${__APT_Y} libass-dev
 RUN apt-get install ${__APT_Y} libfribidi-dev
@@ -56,6 +60,7 @@ RUN sh configure \
     --disable-static \
     --enable-shared \
     --enable-pthreads \
+    --enable-lzma --enable-zlib \
     \
     --enable-iconv \
     --enable-libass \
