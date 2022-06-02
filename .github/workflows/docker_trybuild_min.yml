@@ -1,0 +1,19 @@
+name: test docker build (and tag) - [min]
+
+# Controls when the workflow will run
+#on: [push]
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: docker build ffmpeg-yours-min
+        env:
+          _YOU: hhsprings
+          _VER_MIN: 0.3
+        run: >
+          sh ./build_min.sh
