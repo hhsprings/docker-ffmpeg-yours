@@ -50,7 +50,7 @@ RUN apt-get install -yq --no-install-recommends libFUBAR-dev
 
 # Reuse the configure option in my build and rerun configure.
 RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
-        sed "s@--extra-version=[^\s][^\s]*@--extra-version=yourbuild0.1@"` \
+        sed "s@--extra-version=[^\s][^\s]* @--extra-version=yourbuild0.1 @"` \
         --enable-FUBAR
 
 # Build and install.
