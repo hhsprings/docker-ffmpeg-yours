@@ -11,23 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: docker login
+      - name: docker build ffmpeg-yours-min      
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          _YOU: hhsprings
+          _VER_MIN: 0.3
         run: >
-          docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+          sh ./build_min.sh  
 
-#      - name: docker build ffmpeg-yours-min      
-#        env:
-#          _YOU: hhsprings
-#          _VER_MIN: 0.3
-#        run: >
-#          sh ./build_min.sh  
-#
-#      - name: docker build ffmpeg-yours
-#        env:
-#          _YOU: hhsprings
-#          _VER_YOURS: 0.3
-#        run: >
-#          sh ./build_yours.sh  
+      - name: docker build ffmpeg-yours
+        env:
+          _YOU: hhsprings
+          _VER_YOURS: 0.3
+        run: >
+          sh ./build_yours.sh  
