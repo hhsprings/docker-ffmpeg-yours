@@ -12,15 +12,9 @@ jobs:
       - uses: actions/checkout@main
 
       - name: docker build ffmpeg-yours-min      
-        env:
-          _YOU: hhsprings
-          _VER_MIN: 0.3
         run: >
           sh ./build_min.sh  
 
       - name: docker build ffmpeg-yours
-        env:
-          _YOU: hhsprings
-          _VER_YOURS: 0.3
         run: >
           sh ./build_yours.sh  
