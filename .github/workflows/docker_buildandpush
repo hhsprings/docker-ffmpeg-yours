@@ -1,0 +1,33 @@
+name: integrate to DockerHub
+
+# Controls when the workflow will run
+#on: [push]
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: >
+          docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+
+#      - name: docker build ffmpeg-yours-min      
+#        env:
+#          _YOU: hhsprings
+#          _VER_MIN: 0.3
+#        run: >
+#          sh ./build_min.sh  
+#
+#      - name: docker build ffmpeg-yours
+#        env:
+#          _YOU: hhsprings
+#          _VER_YOURS: 0.3
+#        run: >
+#          sh ./build_yours.sh  
