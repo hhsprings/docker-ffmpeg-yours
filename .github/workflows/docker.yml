@@ -16,18 +16,18 @@ jobs:
           _FFMPEG_VERSION: 4.4.2
           _VER_MIN: 0.3
         run: >
-          docker build -t hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-            --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG}
-            --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION}
-            --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings${_VER_MIN}-min
+          docker build -t hhsprings/ffmpeg-yours-min:${{_VER_MIN}}-${{_FFMPEG_VERSION}}-${{_BUILDPACKDEPS_TAG}}
+            --build-arg _BUILDPACKDEPS_TAG=${{_BUILDPACKDEPS_TAG}}
+            --build-arg _FFMPEG_VERSION=${{_FFMPEG_VERSION}}
+            --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings${{_VER_MIN}}-min
             min
           && (
           docker tag
-            hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-            hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+            hhsprings/ffmpeg-yours-min:${{_VER_MIN}}-${{_FFMPEG_VERSION}}-${{_BUILDPACKDEPS_TAG}}
+            hhsprings/ffmpeg-yours-min:latest-${{_FFMPEG_VERSION}}-${{_BUILDPACKDEPS_TAG}}
           ;
           docker tag
-            hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+            hhsprings/ffmpeg-yours-min:${{_VER_MIN}}-${{_FFMPEG_VERSION}}-${{_BUILDPACKDEPS_TAG}}
             hhsprings/ffmpeg-yours-min:latest
           )
           
