@@ -3,7 +3,7 @@ name: integrate to DockerHub
 # Controls when the workflow will run
 #on: [push]
 on:
-  workflow_run:
+  check_run:
     types:
       - requested
 
