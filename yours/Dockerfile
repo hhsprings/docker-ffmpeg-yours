@@ -108,6 +108,10 @@ RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
          echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
+RUN (\
+     if apt-get install ${__APT_Y} librsvg2-dev ; then \
+         echo --enable-librsvg >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 
 # ----------------------------------------------------------
 #
@@ -117,7 +121,7 @@ RUN (\
 WORKDIR ${FFMPEG_SRCDIR}
 
 RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
-        sed "s@--extra-version=[^\s][^\s]*@--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX}@"` \
+        sed "s@--extra-version=[^\s][^\s]* @--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX} @"` \
     --enable-gpl \
     --enable-version3 \
     \
