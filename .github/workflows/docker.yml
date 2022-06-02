@@ -10,20 +10,24 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: docker build ffmpeg-yours-min
+      - name: docker build ffmpeg-yours-min      
+        env:
+          _BUILDPACKDEPS_TAG: 22.10
+          _FFMPEG_VERSION: 4.4.2
+          _VER_MIN: 0.3
         run: >
-          docker build -t hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
-          --build-arg _BUILDPACKDEPS_TAG=22.10
-          --build-arg _FFMPEG_VERSION=4.4.2
-          --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.3-min
+          docker build -t hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+          --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG}
+          --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION}
+          --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings${_VER_MIN}-min
           min
-
-      - name: docker tag ffmpeg-yours-min:latest
-        run: >
+          && (
           docker tag
-          hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
-          hhsprings/ffmpeg-yours-min:latest-4.4.2-22.10
+          hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+          hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
           ;
           docker tag
-          hhsprings/ffmpeg-yours-min:0.3-4.4.2-22.10
+          hhsprings/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
           hhsprings/ffmpeg-yours-min:latest
+          )
+          
