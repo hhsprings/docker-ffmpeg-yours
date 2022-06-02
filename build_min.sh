@@ -16,7 +16,7 @@ for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
     docker tag \
            ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
            ${_YOU}/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-    if "z${__dopush}" = "z1" ; then
+    if test "z${__dopush}" = "z1" ; then
         (docker push ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} && \
              docker push ${_YOU}/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}) || exit $?
     fi
@@ -24,7 +24,7 @@ for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
         docker tag \
                ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
                ${_YOU}/ffmpeg-yours-min:latest
-        if "z${__dopush}" = "z1" ; then
+        if test "z${__dopush}" = "z1" ; then
             docker push ${_YOU}/ffmpeg-yours-min:latest || exit $?
         fi
     fi
