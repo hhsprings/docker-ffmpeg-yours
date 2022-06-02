@@ -15,14 +15,14 @@ for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
            --build-arg _OPENCV_VERSION=${_OPENCV_VERSION} \
            --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX} \
            . || exit $?
-    if "z${__dopush}" = "z1" ; then
+    if test "z${__dopush}" = "z1" ; then
         docker push ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_OPENCV_VERSION}-${_BUILDPACKDEPS_TAG} || exit $?
     fi
     if test "${_BUILDPACKDEPS_TAG}" = "${_BUILDPACKDEPS_TAG_FOR_LATEST}" ; then
         docker tag \
                ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_OPENCV_VERSION}-${_BUILDPACKDEPS_TAG} \
                ${_YOU}/ffmpeg-yours:latest
-        if "z${__dopush}" = "z1" ; then
+        if test "z${__dopush}" = "z1" ; then
             docker push ${_YOU}/ffmpeg-yours:latest || exit $?
         fi
     fi
