@@ -114,6 +114,7 @@ RUN (\
 RUN apt-get install ${__APT_Y} liblilv-dev
 RUN apt-get install ${__APT_Y} librsvg2-dev
 RUN apt-get install ${__APT_Y} libcodec2-dev
+RUN apt-get install ${__APT_Y} libsmbclient-dev
 RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
          echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
@@ -192,6 +193,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-lv2 \
     --enable-librsvg \
     --enable-libcodec2 \
+    --enable-libsmbclient \
     $(cat _enable_if_available) \
     \
     --enable-opencl \
