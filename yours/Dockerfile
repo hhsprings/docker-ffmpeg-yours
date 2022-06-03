@@ -104,15 +104,12 @@ RUN apt-get install ${__APT_Y} libdrm-dev
 RUN apt-get install ${__APT_Y} librtmp-dev
 RUN apt-get install ${__APT_Y} libxavs2-dev
 RUN apt-get install ${__APT_Y} liblilv-dev
+RUN apt-get install ${__APT_Y} librsvg2-dev
+RUN apt-get install ${__APT_Y} libiec61883-dev
 RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
          echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
-RUN (\
-     if apt-get install ${__APT_Y} librsvg2-dev ; then \
-         echo --enable-librsvg >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-
 # ----------------------------------------------------------
 #
 # finally, full-build of ffmpeg.
@@ -180,6 +177,8 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-librtmp \
     --enable-libxavs2 \
     --enable-lv2 \
+    --enable-librsvg \
+    --enable-libiec61883 \
     $(cat _enable_if_available) \
     \
     --enable-opencl \
