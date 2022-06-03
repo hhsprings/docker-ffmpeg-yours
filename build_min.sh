@@ -6,7 +6,7 @@ export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 export __PULLNEVER=${__PULLNEVER:-""}  # you can set "--pull never" if you want to execute this script locally.
 cd min
-for _FFMPEG_VERSION in 4.2.7 4.3.4 4.4.2 ; do
+for _FFMPEG_VERSION in 4.1.9 4.2.7 4.3.4 4.4.2 ; do
     for _BUILDPACKDEPS_TAG in \
         stretch sid buster bullseye bookworm \
         16.04 18.04 20.04 21.10 22.04 22.10 ; do
