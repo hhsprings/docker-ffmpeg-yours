@@ -11,6 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: docker build ffmpeg-yours-min
+      - name: docker build ffmpeg-yours-min (debian)
         run: >
-          sh ./build_min.sh
+          sh ./build_min_debian.sh
