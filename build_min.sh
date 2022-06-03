@@ -29,6 +29,6 @@ for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
         fi
     fi
     if test $? -eq 0 ; then
-        docker run -it --rm ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} ffmpeg -version
+        docker run -t --rm ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} ffmpeg -version
     fi
 done
