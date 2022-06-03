@@ -40,8 +40,8 @@ RUN apt-get update && \
 # ----------------------------------------------------------
 RUN apt-get install ${__APT_Y} libass-dev
 RUN apt-get install ${__APT_Y} libfribidi-dev
-RUN apt-get install ${__APT_Y} libfontconfig-dev
-RUN apt-get install ${__APT_Y} libfreetype-dev
+RUN apt-get install ${__APT_Y} libfontconfig-dev || apt-get install ${__APT_Y} libfontconfig1-dev
+RUN apt-get install ${__APT_Y} libfreetype-dev || apt-get install ${__APT_Y} libfreetype6-dev
 
 # download specific released version, not current snapshot via git.
 ADD https://ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz .
