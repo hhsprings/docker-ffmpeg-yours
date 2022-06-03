@@ -7,7 +7,7 @@ export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 cd min
 trap 'rm -f __tagged' 0 1 2 3 15
-for _FFMPEG_VERSION in 3.2.18 3.4.11 4.1.9 4.2.7 4.3.4 4.4.2 ; do
+for _FFMPEG_VERSION in 3.4.11 4.1.9 4.2.7 4.3.4 4.4.2 ; do
     for _BUILDPACKDEPS_TAG in ${suites} ; do
 
         echo > __tagged
