@@ -1,5 +1,6 @@
 #! /bin/sh
-export __dopush=$(test "z${1}" = "z--push" && echo 1)
+suites=${1}
+export __dopush=$(test "z${2}" = "z--push" && echo 1)
 export _YOU=${_YOU:-hhsprings}
 export _VER_MIN=${_VER_MIN:-0.4}
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
@@ -7,9 +8,7 @@ export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 cd min
 trap 'rm -f __tagged' 0 1 2 3 15
 for _FFMPEG_VERSION in 4.1.9 4.2.7 4.3.4 4.4.2 ; do
-    for _BUILDPACKDEPS_TAG in \
-        stretch sid buster bullseye bookworm \
-        16.04 18.04 20.04 21.10 22.04 22.10 ; do
+    for _BUILDPACKDEPS_TAG in ${suites} ; do
 
         echo > __tagged
         export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_MIN}-min
