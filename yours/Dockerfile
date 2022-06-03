@@ -122,6 +122,10 @@ RUN (\
      if apt-get install ${__APT_Y} libdav1d-dev ; then \
          echo --enable-libdav1d >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
+RUN (\
+     if apt-get install ${__APT_Y} libopenh264-dev ; then \
+         echo --enable-libopenh264 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 
 # ----------------------------------------------------------
 #
