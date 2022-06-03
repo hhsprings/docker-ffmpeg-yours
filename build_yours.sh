@@ -26,5 +26,7 @@ for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
             docker push ${_YOU}/ffmpeg-yours:latest || exit $?
         fi
     fi
-
+    if $? -eq 0 ; then
+        docker run -it --rm ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_OPENCV_VERSION}-${_BUILDPACKDEPS_TAG} ffmpeg -version
+    fi
 done
