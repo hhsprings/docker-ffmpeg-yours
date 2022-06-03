@@ -14,10 +14,9 @@ for _FFMPEG_VERSION in 4.1.9 4.2.7 4.3.4 4.4.2 ; do
         echo > __tagged
         export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_MIN}-min
         #
-        if (docker run -t \
-                   ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
-                   ffmpeg -version 2>&1) ; then
-            docker rmi --force ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} > /dev/null || true
+        if (docker pull \
+                   ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} > /dev/null) ; then
+            docker rmi --force ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} || true
         else
             docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
                    --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG} \
