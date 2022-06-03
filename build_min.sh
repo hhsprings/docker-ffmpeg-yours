@@ -5,7 +5,7 @@ export _VER_MIN=${_VER_MIN:-0.3}
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
 cd min
-for _BUILDPACKDEPS_TAG in 18.04 20.04 21.10 22.04 22.10 ; do
+for _BUILDPACKDEPS_TAG in 20.04 21.10 22.04 22.10 ; do
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_MIN}-min
     docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
