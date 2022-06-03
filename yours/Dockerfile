@@ -121,7 +121,7 @@ RUN (\
 WORKDIR ${FFMPEG_SRCDIR}
 
 RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
-        sed "s@--extra-version=[^\s][^\s]* @--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX} @"` \
+        sed "s@--extra-version=[^ ][^ ]* @--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX} @"` \
     --enable-gpl \
     --enable-version3 \
     \
