@@ -74,7 +74,8 @@ RUN sh configure \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
-    --disable-txtpages
+    --disable-txtpages || sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
+    sed 's@ --disable-txtpages@@'`
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
