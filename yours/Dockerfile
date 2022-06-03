@@ -71,7 +71,10 @@ RUN apt-get install ${__APT_Y} flite1-dev
 RUN apt-get install ${__APT_Y} libchromaprint-dev
 RUN apt-get install ${__APT_Y} librubberband-dev
 RUN apt-get install ${__APT_Y} libzmq5-dev
-RUN apt-get install ${__APT_Y} libzimg-dev
+RUN (\
+     if apt-get install ${__APT_Y} libzimg-dev ; then \
+         echo --enable-libzimg >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 RUN apt-get install ${__APT_Y} libsoxr-dev
 RUN apt-get install ${__APT_Y} libtheora-dev
 RUN apt-get install ${__APT_Y} libmysofa-dev
@@ -90,7 +93,10 @@ RUN apt-get install ${__APT_Y} glslang-dev
 RUN apt-get install ${__APT_Y} libmfx-dev
 RUN apt-get install ${__APT_Y} libvidstab-dev
 RUN apt-get install ${__APT_Y} libxvidcore-dev
-RUN apt-get install ${__APT_Y} libsvtav1enc-dev
+RUN (\
+     if apt-get install ${__APT_Y} libsvtav1enc-dev ; then \
+         echo --enable-libsvtav1 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 RUN apt-get install ${__APT_Y} libzvbi-dev
 RUN apt-get install ${__APT_Y} libcaca-dev
 RUN apt-get install ${__APT_Y} libbluray-dev
@@ -101,7 +107,10 @@ RUN apt-get install ${__APT_Y} libpocketsphinx-dev
 RUN apt-get install ${__APT_Y} pocketsphinx-en-us
 RUN apt-get install ${__APT_Y} libdrm-dev
 RUN apt-get install ${__APT_Y} librtmp-dev
-RUN apt-get install ${__APT_Y} libxavs2-dev
+RUN (\
+     if apt-get install ${__APT_Y} libxavs2-dev ; then \
+         echo --enable-libxavs2 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 RUN apt-get install ${__APT_Y} liblilv-dev
 RUN apt-get install ${__APT_Y} librsvg2-dev
 RUN apt-get install ${__APT_Y} libcodec2-dev
@@ -148,7 +157,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-librubberband \
     --enable-chromaprint \
     --enable-libzmq \
-    --enable-libzimg \
     --enable-libsoxr \
     --enable-libtheora \
     --enable-libmysofa \
@@ -168,7 +176,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-libmfx \
     --enable-libvidstab \
     --enable-libxvid \
-    --enable-libsvtav1 \
     --enable-libzvbi \
     --enable-libcaca \
     --enable-libbluray \
@@ -178,7 +185,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-pocketsphinx \
     --enable-libdrm \
     --enable-librtmp \
-    --enable-libxavs2 \
     --enable-lv2 \
     --enable-librsvg \
     --enable-libcodec2 \
