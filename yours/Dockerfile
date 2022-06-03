@@ -109,10 +109,6 @@ RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
          echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
-RUN (\
-     if apt-get install ${__APT_Y} libiec61883-dev ; then \
-         echo --enable-libiec61883 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
 
 # ----------------------------------------------------------
 #
