@@ -92,7 +92,6 @@ RUN apt-get install ${__APT_Y} libvidstab-dev
 RUN apt-get install ${__APT_Y} libxvidcore-dev
 RUN apt-get install ${__APT_Y} libsvtav1enc-dev
 RUN apt-get install ${__APT_Y} libzvbi-dev
-RUN apt-get install ${__APT_Y} libdav1d-dev
 RUN apt-get install ${__APT_Y} libcaca-dev
 RUN apt-get install ${__APT_Y} libbluray-dev
 RUN apt-get install ${__APT_Y} libsnappy-dev
@@ -105,9 +104,14 @@ RUN apt-get install ${__APT_Y} librtmp-dev
 RUN apt-get install ${__APT_Y} libxavs2-dev
 RUN apt-get install ${__APT_Y} liblilv-dev
 RUN apt-get install ${__APT_Y} librsvg2-dev
+RUN apt-get install ${__APT_Y} libfdk-aac-dev
 RUN (\
      if apt-get install ${__APT_Y} librist-dev ; then \
          echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
+RUN (\
+     if apt-get install ${__APT_Y} libdav1d-dev ; then \
+         echo --enable-libdav1d >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
 
 # ----------------------------------------------------------
@@ -166,7 +170,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-libxvid \
     --enable-libsvtav1 \
     --enable-libzvbi \
-    --enable-libdav1d \
     --enable-libcaca \
     --enable-libbluray \
     --enable-libsnappy \
@@ -178,6 +181,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-libxavs2 \
     --enable-lv2 \
     --enable-librsvg \
+    --enable-libfdk-aac \
     $(cat _enable_if_available) \
     \
     --enable-opencl \
