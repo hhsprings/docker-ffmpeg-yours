@@ -40,6 +40,6 @@ for _BUILDPACKDEPS_TAG in \
         #fi
         #if test $? -eq 0 ; then
         #    docker run -t --rm ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} ffmpeg -version
-        fi
+        #fi
     fi
 done
