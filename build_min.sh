@@ -4,6 +4,7 @@ export _YOU=${_YOU:-hhsprings}
 export _VER_MIN=${_VER_MIN:-0.4}
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
+export __PULLNEVER=${__PULLNEVER:-""}  # you can set "--pull never" if you want to execute this script locally.
 cd min
 for _BUILDPACKDEPS_TAG in \
     stretch sid buster bullseye bookworm \
@@ -11,10 +12,9 @@ for _BUILDPACKDEPS_TAG in \
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_MIN}-min
     #
-    if (docker run --pull never -t \
+    if (docker run ${__PULLNEVER} -t \
                ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
                ffmpeg --version 2>&1) > /dev/null ; then
-        # already exists
         :
     else
         docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
