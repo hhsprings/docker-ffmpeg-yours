@@ -66,6 +66,10 @@ RUN apt-get install ${__APT_Y} libvorbis-dev
 #
 RUN apt-get install ${__APT_Y} libbs2b-dev
 RUN apt-get install ${__APT_Y} frei0r-plugins-dev
+# frei0r-plugins-dev don't install /usr/lib/frei0r-1 files.
+RUN apt-get install ${__APT_Y} frei0r-plugins
+ENV FREI0R_PATH=/usr/lib/frei0r-1
+
 RUN apt-get install ${__APT_Y} libtesseract-dev libleptonica-dev tesseract-ocr-eng
 RUN apt-get install ${__APT_Y} flite1-dev
 RUN apt-get install ${__APT_Y} libchromaprint-dev
@@ -80,6 +84,7 @@ RUN apt-get install ${__APT_Y} libtheora-dev
 RUN apt-get install ${__APT_Y} libmysofa-dev
 RUN apt-get install ${__APT_Y} libshine-dev
 
+#
 RUN apt-get install ${__APT_Y} ladspa-sdk
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN apt-get install ${__APT_Y} csladspa || true
