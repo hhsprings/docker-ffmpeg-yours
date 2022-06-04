@@ -2,7 +2,6 @@
 ARG _BUILDPACKDEPS_TAG=22.04
 ARG _FFMPEG_VERSION=4.4.2
 FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-ARG _OPENCV_VERSION=3.4.15
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG __APT_Y="-yq --no-install-recommends"
@@ -12,30 +11,11 @@ RUN apt-get update && \
 
 # ----------------------------------------------------------
 #
-# build opencv from source, because libopencv-dev of apt
-# is broken or at least CRAZY in my humble opinion.
+# minimul installation of libopencv using with libopencv-core-dev.
+# don't try to use libopencv-dev, because it is crazy.
 #
 # ----------------------------------------------------------
-# opencv from source
-RUN apt-get install ${__APT_Y} libgtk2.0-dev
-
-WORKDIR /tmp/build
-# download specific released version, not current snapshot via git.
-ADD https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz .
-
-RUN tar zxvf ${_OPENCV_VERSION}.tar.gz && rm -fv ${_OPENCV_VERSION}.tar.gz
-ENV OPENCV_SRCDIR=/tmp/build/opencv-${_OPENCV_VERSION}
-WORKDIR ${OPENCV_SRCDIR}
-RUN mkdir build
-WORKDIR ${OPENCV_SRCDIR}/build
-# "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
-RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
-    -D OPENCV_GENERATE_PKGCONFIG=ON \
-    -D BUILD_TESTS=OFF \
-    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
-    ..
-RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
-RUN make install
+RUN apt-get install ${__APT_Y} libopencv-core-dev
 
 # ----------------------------------------------------------
 #
