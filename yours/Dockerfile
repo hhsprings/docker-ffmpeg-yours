@@ -79,7 +79,17 @@ RUN apt-get install ${__APT_Y} libsoxr-dev
 RUN apt-get install ${__APT_Y} libtheora-dev
 RUN apt-get install ${__APT_Y} libmysofa-dev
 RUN apt-get install ${__APT_Y} libshine-dev
+
 RUN apt-get install ${__APT_Y} ladspa-sdk
+# The LADSPA plug-in that follows is not essential, so simply ignore the error.
+RUN apt-get install ${__APT_Y} csladspa || true
+RUN apt-get install ${__APT_Y} bs2b-ladspa || true
+RUN apt-get install ${__APT_Y} guitarix-ladspa || true
+RUN apt-get install ${__APT_Y} invada-studio-plugins-ladspa || true
+RUN apt-get install ${__APT_Y} rubberband-ladspa || true
+# Environment variable for /usr/bin/listplugins, etc.
+ENV LADSPA_PATH=/usr/lib/ladspa
+
 RUN apt-get install ${__APT_Y} libspeex-dev
 RUN apt-get install ${__APT_Y} libgme-dev
 RUN apt-get install ${__APT_Y} libgsm1-dev
