@@ -10,6 +10,9 @@ ARG __APT_Y="-yq --no-install-recommends"
 RUN apt-get update && \
     apt-get ${__APT_Y} upgrade
 
+#
+RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
+
 # ----------------------------------------------------------
 #
 # build opencv from source, because libopencv-dev of apt
@@ -36,7 +39,8 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
     ..
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
-
+RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
+    
 # ----------------------------------------------------------
 #
 # prepare dependancies which we can get with apt-get
@@ -44,11 +48,17 @@ RUN make install
 #
 # ----------------------------------------------------------
 #
-RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
-#
 RUN apt-get install ${__APT_Y} libssh-dev
 RUN apt-get install ${__APT_Y} libgnutls28-dev
-RUN apt-get install ${__APT_Y} nvidia-opencl-dev
+RUN (\
+     if apt-get install ${__APT_Y} ocl-icd-opencl-dev ; then \
+         echo --enable-opencl >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
+RUN (\
+     if apt-get install ${__APT_Y} nvidia-opencl-dev ; then \
+         grep opencl ${FFMPEG_SRCDIR}/_enable_if_available${FFMPEG_SRCDIR}/_enable_if_available || \
+             echo --enable-opencl >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
+     fi) || true
 
 #
 RUN apt-get install ${__APT_Y} libsrt-gnutls-dev
@@ -209,10 +219,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-librsvg \
     --enable-libcodec2 \
     --enable-libsmbclient \
-    $(cat _enable_if_available) \
-    \
-    --enable-opencl \
-    --enable-libopencv
+    $(cat _enable_if_available)
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
