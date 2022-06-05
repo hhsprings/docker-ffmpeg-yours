@@ -135,6 +135,7 @@ RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librist-dev "" --enable-librist
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libdav1d-dev "" --enable-libdav1d
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopenh264-dev "" --enable-libopenh264
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librabbitmq-dev "" --enable-librabbitmq
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
 
 # ----------------------------------------------------------
 #
