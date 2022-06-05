@@ -48,17 +48,21 @@ RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
 #
 # ----------------------------------------------------------
 #
+RUN << __EOF__ > ${FFMPEG_SRCDIR}/_apt_install.sh
+#! /bin/sh
+# $1: apt package(s)
+# $2: a flag of configure
+if apt-get install ${__APT_Y} $1 ; then
+    grep -- "$2" ${FFMPEG_SRCDIR}/_enable_if_available > /dev/null || \
+        echo $2 >> ${FFMPEG_SRCDIR}/_enable_if_available
+else
+    true
+fi
+__EOF__
 RUN apt-get install ${__APT_Y} libssh-dev
 RUN apt-get install ${__APT_Y} libgnutls28-dev
-RUN (\
-     if apt-get install ${__APT_Y} ocl-icd-opencl-dev ; then \
-         echo --enable-opencl >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN (\
-     if apt-get install ${__APT_Y} nvidia-opencl-dev ; then \
-         grep opencl ${FFMPEG_SRCDIR}/_enable_if_available${FFMPEG_SRCDIR}/_enable_if_available || \
-             echo --enable-opencl >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
+RUN ${FFMPEG_SRCDIR}/_apt_install.sh ocl-icd-opencl-dev --enable-opencl
+RUN ${FFMPEG_SRCDIR}/_apt_install.sh nvidia-opencl-dev --enable-opencl
 
 #
 RUN apt-get install ${__APT_Y} libsrt-gnutls-dev
@@ -152,6 +156,7 @@ RUN (\
      if apt-get install ${__APT_Y} libopenh264-dev ; then \
          echo --enable-libopenh264 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
      fi) || true
+RUN apt-get install ${__APT_Y} librabbitmq-dev
 
 # ----------------------------------------------------------
 #
@@ -219,6 +224,7 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-librsvg \
     --enable-libcodec2 \
     --enable-libsmbclient \
+    --enable-librabbitmq \
     $(cat _enable_if_available)
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
