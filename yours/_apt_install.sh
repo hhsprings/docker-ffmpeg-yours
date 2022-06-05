@@ -6,14 +6,12 @@
 if apt-get install -yq --no-install-recommends ${2} ; then
     grep -- "${4}" ${1}/_enable_if_available > /dev/null || \
         echo ${4} >> ${1}/_enable_if_available
-else
-    if test "z$3" != "z" ; then
-        if apt-get install -yq --no-install-recommends ${3} ; then
-            grep -- "${4}" ${1}/_enable_if_available > /dev/null || \
-                echo ${4} >> ${1}/_enable_if_available
-        else
-            true
+elif test "z$3" != "z" ; then
+    if apt-get install -yq --no-install-recommends ${3} ; then
+        grep -- "${4}" ${1}/_enable_if_available > /dev/null || \
+            echo ${4} >> ${1}/_enable_if_available
     else
         true
-    fi
+else
+    true
 fi
