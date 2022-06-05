@@ -5,6 +5,8 @@ export _VER_YOURS=0.6
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
 export _OPENCV_VERSION=3.4.15
+
+export DOCKER_BUILDKIT=1  # i want to use heredoc in my Dockerfile
 cd yours
 for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
 
