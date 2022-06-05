@@ -6,12 +6,11 @@ export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
 export _OPENCV_VERSION=3.4.15
 
-export DOCKER_BUILDKIT=1  # i want to use heredoc in my Dockerfile
 cd yours
 for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
-    docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
+    docker buildx -f Dockerfile -t ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
            --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG} \
            --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION} \
            --build-arg _OPENCV_VERSION=${_OPENCV_VERSION} \
