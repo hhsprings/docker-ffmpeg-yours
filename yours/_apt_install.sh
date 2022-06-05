@@ -12,6 +12,7 @@ elif test "z$3" != "z" ; then
             echo ${4} >> ${1}/_enable_if_available
     else
         true
+    fi
 else
     true
 fi
