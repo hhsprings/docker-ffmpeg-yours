@@ -10,7 +10,7 @@ cd yours
 for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
-    docker buildx build -f Dockerfile -t ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
+    docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
            --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG} \
            --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION} \
            --build-arg _OPENCV_VERSION=${_OPENCV_VERSION} \
