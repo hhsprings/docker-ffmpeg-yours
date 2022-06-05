@@ -48,21 +48,11 @@ RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
 #
 # ----------------------------------------------------------
 #
-RUN <<EOF > ${FFMPEG_SRCDIR}/_apt_install.sh
-#! /bin/sh
-# $1: apt package(s)
-# $2: a flag of configure
-if apt-get install ${__APT_Y} $1 ; then
-    grep -- "$2" ${FFMPEG_SRCDIR}/_enable_if_available > /dev/null || \
-        echo $2 >> ${FFMPEG_SRCDIR}/_enable_if_available
-else
-    true
-fi
-EOF
+COPY _apt_install.sh /tmp/build
 RUN apt-get install ${__APT_Y} libssh-dev
 RUN apt-get install ${__APT_Y} libgnutls28-dev
-RUN ${FFMPEG_SRCDIR}/_apt_install.sh ocl-icd-opencl-dev --enable-opencl
-RUN ${FFMPEG_SRCDIR}/_apt_install.sh nvidia-opencl-dev --enable-opencl
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} ocl-icd-opencl-dev --enable-opencl
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} nvidia-opencl-dev --enable-opencl
 
 #
 RUN apt-get install ${__APT_Y} libsrt-gnutls-dev
