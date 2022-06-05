@@ -49,47 +49,49 @@ RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
 # ----------------------------------------------------------
 #
 COPY _apt_install.sh /tmp/build
-RUN apt-get install ${__APT_Y} libssh-dev
+RUN chmod u+x /tmp/build/_apt_install.sh
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libssh-dev --enable-libssh
 RUN apt-get install ${__APT_Y} libgnutls28-dev
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} ocl-icd-opencl-dev --enable-opencl
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} nvidia-opencl-dev --enable-opencl
 
 #
-RUN apt-get install ${__APT_Y} libsrt-gnutls-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsrt-gnutls-dev --enable-libsrt
 
 #
-RUN apt-get install ${__APT_Y} libx264-dev
-RUN apt-get install ${__APT_Y} libx265-dev
-RUN apt-get install ${__APT_Y} libvpx-dev
-RUN apt-get install ${__APT_Y} libaom-dev
-RUN apt-get install ${__APT_Y} libmp3lame-dev
-RUN apt-get install ${__APT_Y} libtwolame-dev
-RUN apt-get install ${__APT_Y} libopus-dev
-RUN apt-get install ${__APT_Y} libvorbis-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libx264-dev --enable-libx264
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libx265-dev --enable-libx265
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libvpx-dev --enable-libvpx
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libwebp-dev --enable-libwebp
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libaom-dev --enable-libaom
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libmp3lame-dev --enable-libmp3lame
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libtwolame-dev --enable-libtwolame
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopus-dev --enable-libopus
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libvorbis-dev --enable-libvorbis
 
 #
-RUN apt-get install ${__APT_Y} libbs2b-dev
-RUN apt-get install ${__APT_Y} frei0r-plugins-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libbs2b-dev --enable-libbs2b
 # frei0r-plugins-dev don't install /usr/lib/frei0r-1 files.
-RUN apt-get install ${__APT_Y} frei0r-plugins
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} "frei0r-plugins-dev frei0r-plugins" --enable-frei0r
 ENV FREI0R_PATH=/usr/lib/frei0r-1
 
-RUN apt-get install ${__APT_Y} libtesseract-dev libleptonica-dev tesseract-ocr-eng
-RUN apt-get install ${__APT_Y} flite1-dev
-RUN apt-get install ${__APT_Y} libchromaprint-dev
-RUN apt-get install ${__APT_Y} librubberband-dev
-RUN apt-get install ${__APT_Y} libzmq5-dev
-RUN (\
-     if apt-get install ${__APT_Y} libzimg-dev ; then \
-         echo --enable-libzimg >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN apt-get install ${__APT_Y} libsoxr-dev
-RUN apt-get install ${__APT_Y} libtheora-dev
-RUN apt-get install ${__APT_Y} libmysofa-dev
-RUN apt-get install ${__APT_Y} libshine-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} \
+    "libtesseract-dev libleptonica-dev tesseract-ocr-eng" --enable-libtesseract
+
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} flite1-dev --enable-libflite
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libchromaprint-dev --enable-chromaprint
+
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librubberband-dev --enable-librubberband
+
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libzmq5-dev --enable-libzmq
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libzimg-dev --enable-libzimg
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsoxr-dev --enable-libsoxr
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libtheora-dev --enable-libtheora
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libmysofa-dev --enable-libmysofa
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libshine-dev --enable-libshine
 
 #
-RUN apt-get install ${__APT_Y} ladspa-sdk
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} ladspa-sdk --enable-ladspa
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN apt-get install ${__APT_Y} csladspa || true
 RUN apt-get install ${__APT_Y} bs2b-ladspa || true
@@ -99,54 +101,40 @@ RUN apt-get install ${__APT_Y} rubberband-ladspa || true
 # Environment variable for /usr/bin/listplugins, etc.
 ENV LADSPA_PATH=/usr/lib/ladspa
 
-RUN apt-get install ${__APT_Y} libspeex-dev
-RUN apt-get install ${__APT_Y} libgme-dev
-RUN apt-get install ${__APT_Y} libgsm1-dev
-RUN apt-get install ${__APT_Y} libopenmpt-dev
-RUN apt-get install ${__APT_Y} libmodplug-dev
-RUN apt-get install ${__APT_Y} libopencore-amrwb-dev
-RUN apt-get install ${__APT_Y} libopencore-amrnb-dev
-RUN apt-get install ${__APT_Y} libvo-amrwbenc-dev
-RUN apt-get install ${__APT_Y} libvulkan-dev
-RUN apt-get install ${__APT_Y} glslang-dev
-RUN apt-get install ${__APT_Y} libmfx-dev
-RUN apt-get install ${__APT_Y} libvidstab-dev
-RUN apt-get install ${__APT_Y} libxvidcore-dev
-RUN (\
-     if apt-get install ${__APT_Y} libsvtav1enc-dev ; then \
-         echo --enable-libsvtav1 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN apt-get install ${__APT_Y} libzvbi-dev
-RUN apt-get install ${__APT_Y} libcaca-dev
-RUN apt-get install ${__APT_Y} libbluray-dev
-RUN apt-get install ${__APT_Y} libsnappy-dev
-RUN apt-get install ${__APT_Y} libgmp-dev
-RUN apt-get install ${__APT_Y} libpulse-dev
-RUN apt-get install ${__APT_Y} libpocketsphinx-dev
-RUN apt-get install ${__APT_Y} pocketsphinx-en-us
-RUN apt-get install ${__APT_Y} libdrm-dev
-RUN apt-get install ${__APT_Y} librtmp-dev
-RUN (\
-     if apt-get install ${__APT_Y} libxavs2-dev ; then \
-         echo --enable-libxavs2 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libspeex-dev --enable-libspeex
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libgme-dev --enable-libgme
+
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libgsm1-dev --enable-libgsm
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopenmpt-dev --enable-libopenmpt
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libmodplug-dev --enable-libmodplug
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopencore-amrwb-dev --enable-libopencore-amrwb
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopencore-amrnb-dev --enable-libopencore-amrnb
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libvo-amrwbenc-dev --enable-libvo-amrwbenc
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libvulkan-dev --enable-vulkan
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} glslang-dev --enable-libglslang
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libmfx-dev --enable-libmfx
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libvidstab-dev --enable-libvidstab
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libxvidcore-dev --enable-libxvid
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsvtav1enc-dev --enable-libsvtav1
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libzvbi-dev --enable-libzvbi
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libcaca-dev --enable-libcaca
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libbluray-dev --enable-libbluray
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsnappy-dev --enable-libsnappy
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libgmp-dev --enable-gmp
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libpulse-dev --enable-libpulse
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} \
+    "libpocketsphinx-dev pocketsphinx-en-us" --enable-pocketsphinx
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libdrm-dev --enable-libdrm
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librtmp-dev --enable-librtmp
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libxavs2-dev --enable-libxavs2
 RUN apt-get install ${__APT_Y} liblilv-dev
-RUN apt-get install ${__APT_Y} librsvg2-dev
-RUN apt-get install ${__APT_Y} libcodec2-dev
-RUN apt-get install ${__APT_Y} libsmbclient-dev
-RUN (\
-     if apt-get install ${__APT_Y} librist-dev ; then \
-         echo --enable-librist >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN (\
-     if apt-get install ${__APT_Y} libdav1d-dev ; then \
-         echo --enable-libdav1d >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN (\
-     if apt-get install ${__APT_Y} libopenh264-dev ; then \
-         echo --enable-libopenh264 >> ${FFMPEG_SRCDIR}/_enable_if_available ; \
-     fi) || true
-RUN apt-get install ${__APT_Y} librabbitmq-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librsvg2-dev --enable-librsvg
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libcodec2-dev --enable-libcodec2
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsmbclient-dev --enable-libsmbclient
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librist-dev --enable-librist
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libdav1d-dev --enable-libdav1d
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libopenh264-dev --enable-libopenh264
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librabbitmq-dev --enable-librabbitmq
 
 # ----------------------------------------------------------
 #
@@ -160,61 +148,10 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     --enable-gpl \
     --enable-version3 \
     \
-    --enable-libsrt \
-    \
-    --enable-libssh \
     --enable-gnutls \
     \
-    --enable-libx264 \
-    --enable-libx265 \
-    --enable-libvpx \
-    --enable-libwebp \
-    --enable-libaom \
-    --enable-libmp3lame \
-    --enable-libtwolame \
-    --enable-libopus \
-    --enable-libvorbis \
-    \
-    --enable-libbs2b \
-    --enable-frei0r \
-    --enable-libflite \
-    --enable-libtesseract \
-    --enable-librubberband \
-    --enable-chromaprint \
-    --enable-libzmq \
-    --enable-libsoxr \
-    --enable-libtheora \
-    --enable-libmysofa \
-    --enable-libshine \
-    --enable-ladspa \
-    --enable-libspeex \
     --enable-libopenjpeg \
-    --enable-libgme \
-    --enable-libgsm \
-    --enable-libopenmpt \
-    --enable-libmodplug \
-    --enable-libopencore-amrwb \
-    --enable-libopencore-amrnb \
-    --enable-libvo-amrwbenc \
-    --enable-vulkan \
-    --enable-libglslang \
-    --enable-libmfx \
-    --enable-libvidstab \
-    --enable-libxvid \
-    --enable-libzvbi \
-    --enable-libcaca \
-    --enable-libbluray \
-    --enable-libsnappy \
-    --enable-gmp \
-    --enable-libpulse \
-    --enable-pocketsphinx \
-    --enable-libdrm \
-    --enable-librtmp \
     --enable-lv2 \
-    --enable-librsvg \
-    --enable-libcodec2 \
-    --enable-libsmbclient \
-    --enable-librabbitmq \
     $(cat _enable_if_available)
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
