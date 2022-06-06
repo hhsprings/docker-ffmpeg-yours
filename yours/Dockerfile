@@ -12,6 +12,8 @@ RUN apt-get update && \
 
 #
 RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
+WORKDIR /tmp/build
+COPY ../min/_apt_install.sh /tmp/build
 
 # ----------------------------------------------------------
 #
@@ -22,7 +24,6 @@ RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
 # opencv from source
 RUN apt-get install ${__APT_Y} libgtk2.0-dev
 
-WORKDIR /tmp/build
 # download specific released version, not current snapshot via git.
 ADD https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz .
 
@@ -48,7 +49,6 @@ RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
 #
 # ----------------------------------------------------------
 #
-COPY ../min/_apt_install.sh /tmp/build
 RUN chmod u+x /tmp/build/_apt_install.sh
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libssh-dev "" --enable-libssh
 RUN apt-get install ${__APT_Y} libgnutls28-dev
