@@ -60,3 +60,10 @@ RUN make install
 As mentioned above, the source tree, intermediate files, etc. are all left unerased, so you may want to clean them up.
 
 By the way, you can easily see the difference between /ffmpeg-yours and /ffmpeg-yours-min by reading my Dockerfile.
+
+## About why I needed this
+I wanted to use it for [this explanation](https://hhsprings.bitbucket.io/docs/programming/examples/ffmpeg/misc/ffmpeg_on_docker.html)
+for casual users of ffmpeg. That is, I needed "freedom" for me rather than being perfect.
+
+As I wrote in the link, there must be a container that is more suitable for you than mine.
+
