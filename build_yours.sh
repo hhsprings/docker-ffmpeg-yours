@@ -7,7 +7,7 @@ export _FFMPEG_VERSION=4.4.2
 export _OPENCV_VERSION=3.4.15
 
 cd yours
-for _BUILDPACKDEPS_TAG in 22.04 22.10 ; do
+for _BUILDPACKDEPS_TAG in 22.10 22.04 ; do
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
     docker build -f Dockerfile -t ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
