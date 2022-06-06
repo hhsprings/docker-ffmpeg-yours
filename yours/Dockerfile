@@ -23,7 +23,7 @@ RUN chmod u+x /tmp/build/_apt_install.sh
 #
 # ----------------------------------------------------------
 # opencv from source
-RUN apt-get install ${__APT_Y} libgtk2.0-dev
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libgtk2.0-dev "" ""
 
 # download specific released version, not current snapshot via git.
 ADD https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz .
