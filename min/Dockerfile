@@ -7,7 +7,7 @@ ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1-min
 ARG __APT_Y="-yq --no-install-recommends"
 
 #
-RUN apt-get update && \
+RUN apt-get -q update && \
     apt-get ${__APT_Y} upgrade
 
 #
