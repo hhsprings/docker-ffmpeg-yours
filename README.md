@@ -58,6 +58,21 @@ RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
 ```
 As mentioned above, the source tree, intermediate files, etc. are all left unerased, so you may want to clean them up.
+Also, you want to replace dependant packages -dev version to runtime version. In that case, for example you can:
+
+```Dockerfile
+FROM hhsprings/ffmpeg-yours AS ffmpeg-yours
+
+# ...
+
+FROM ubuntu:22.10  # Make it the same as the one in "ffmpeg-yours".
+WORKDIR /tmp/build
+COPY --from=ffmpeg-yours /usr/local /usr/local
+COPY --from=ffmpeg-yours /tmp/build/_apt_install.sh.req-log /tmp/build/
+RUN apt install -y --no-install-recommends $(cat /tmp/build/_apt_install.sh.req-log)
+# you need to set environment variables, at least LD_LIBRARY_PATH
+# ENV ...
+```
 
 By the way, you can easily see the difference between /ffmpeg-yours and /ffmpeg-yours-min by reading my Dockerfile.
 
