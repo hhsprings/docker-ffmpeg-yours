@@ -5,12 +5,16 @@ ARG _FFMPEG_VERSION=4.4.2
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1-min
 ARG __APT_Y="-yq --no-install-recommends"
-#
-WORKDIR /tmp/build
 
 #
 RUN apt-get update && \
     apt-get ${__APT_Y} upgrade
+
+#
+WORKDIR /tmp/build
+RUN touch /tmp/build/_enable_if_available
+COPY _apt_install.sh /tmp/build
+RUN chmod u+x /tmp/build/_apt_install.sh
 
 # ----------------------------------------------------------
 #
@@ -26,22 +30,26 @@ RUN apt-get update && \
 # better to consider the overall balance, including the problem
 # of image build time.
 #
-# I thought I'd include text-related things in this "small ffmpeg".
-# It may be different from your way of thinking. Even so, instead
-# of asking me to change my mind, create your own Docker image.
-# The purpose of this project is not to provide off-the-shelf
-# products, but to "provide a template for you to create ffmpeg
-# for yourself".
+# I thought I'd include text-related things (plus some essentials)
+# in this "small ffmpeg". It may be different from your way of
+# thinking. Even so, instead of asking me to change my mind, create
+# your own Docker image. The purpose of this project is not to provide
+# off-the-shelf products, but to "provide a template for you to create
+# ffmpeg for yourself".
 #
 # By the way, I have specified some auto-discovered options (lzma,
 # zlib, etc.) for clarity. Setting "--enable-" for something that
 # is detected as "available" by auto-discovery has no effect on
 # the execution of the final FFMPEG other than the banner output.
 # ----------------------------------------------------------
-RUN apt-get install ${__APT_Y} libass-dev
-RUN apt-get install ${__APT_Y} libfribidi-dev
-RUN apt-get install ${__APT_Y} libfontconfig-dev || apt-get install ${__APT_Y} libfontconfig1-dev
-RUN apt-get install ${__APT_Y} libfreetype-dev || apt-get install ${__APT_Y} libfreetype6-dev
+RUN /tmp/build/_apt_install.sh "ffmpeg" zlib1g-dev "" --enable-zlib
+RUN /tmp/build/_apt_install.sh "ffmpeg" liblzma-dev "" --enable-lzma
+RUN /tmp/build/_apt_install.sh "ffmpeg" libxml2-dev "" --enable-libxml2
+RUN /tmp/build/_apt_install.sh "ffmpeg" libass-dev "" --enable-libass
+RUN /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi
+RUN /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig
+RUN /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype
+RUN /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg
 
 # download specific released version, not current snapshot via git.
 ADD https://ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz .
@@ -60,14 +68,10 @@ RUN sh configure \
     --disable-static \
     --enable-shared \
     --enable-pthreads \
-    --enable-lzma --enable-zlib \
     \
     --enable-iconv \
-    --enable-libass \
-    --enable-libfribidi \
-    --enable-libfontconfig \
-    --enable-libfreetype \
-    --enable-libxml2 \
+    \
+    $(grep "^ffmpeg:" /tmp/build/_enable_if_available | sed 's@^ffmpeg:@@') \
     \
     --disable-ffplay \
     --disable-doc \
