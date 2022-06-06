@@ -12,9 +12,6 @@ RUN apt-get update && \
 
 #
 WORKDIR /tmp/build
-RUN touch /tmp/build/_enable_if_available
-COPY _apt_install.sh /tmp/build
-RUN chmod u+x /tmp/build/_apt_install.sh
 
 # ----------------------------------------------------------
 #
@@ -151,7 +148,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
     \
     --enable-gnutls \
     \
-    --enable-libopenjpeg \
     $(grep "^ffmpeg:" /tmp/build/_enable_if_available | sed 's@^ffmpeg:@@')
 
 RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
