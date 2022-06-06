@@ -127,7 +127,7 @@ RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} \
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libdrm-dev "" --enable-libdrm
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librtmp-dev "" --enable-librtmp
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libxavs2-dev "" --enable-libxavs2
-RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} liblilv-dev "" --enable-lv2
+RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} "liblilv-dev lilv-utils" "" --enable-lv2
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} librsvg2-dev "" --enable-librsvg
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libcodec2-dev "" --enable-libcodec2
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libsmbclient-dev "" --enable-libsmbclient
