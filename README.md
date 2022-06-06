@@ -70,6 +70,7 @@ FROM ubuntu:22.10
 WORKDIR /tmp/build
 COPY --from=ffmpeg-yours /usr/local /usr/local
 COPY --from=ffmpeg-yours /tmp/build/_apt_install.sh.req-log /tmp/build/
+RUN apt-get -q update && apt-get -y --no-install-recommends upgrade
 RUN apt install -y --no-install-recommends $(cat /tmp/build/_apt_install.sh.req-log)
 # you need to set environment variables, at least LD_LIBRARY_PATH
 # ENV ...
