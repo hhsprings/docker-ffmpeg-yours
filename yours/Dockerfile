@@ -32,6 +32,8 @@ RUN mkdir build
 WORKDIR ${OPENCV_SRCDIR}/build
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
 RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D BUILD_SHARED_LIBS=ON \
+    -D ENABLE_PIC=ON \
     -D OPENCV_GENERATE_PKGCONFIG=ON \
     -D BUILD_TESTS=OFF \
     -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
