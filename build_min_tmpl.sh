@@ -2,7 +2,7 @@
 suites=${1}
 export __dopush=$(test "z${2}" = "z--push" && echo 1)
 export _YOU=${_YOU:-hhsprings}
-export _VER_MIN=${_VER_MIN:-0.4}
+export _VER_MIN=${_VER_MIN:-0.5}
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 cd min
