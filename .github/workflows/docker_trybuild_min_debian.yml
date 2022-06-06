@@ -1,4 +1,4 @@
-name: test docker build (and tag) - [min]
+name: test docker build (and tag) - [min, debian]
 
 # Controls when the workflow will run
 #on: [push]
