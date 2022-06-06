@@ -65,7 +65,8 @@ FROM hhsprings/ffmpeg-yours AS ffmpeg-yours
 
 # ...
 
-FROM ubuntu:22.10  # Make it the same as the one in "ffmpeg-yours".
+# 22.10==kinetic. Make it the same as the one in "ffmpeg-yours".
+FROM ubuntu:22.10
 WORKDIR /tmp/build
 COPY --from=ffmpeg-yours /usr/local /usr/local
 COPY --from=ffmpeg-yours /tmp/build/_apt_install.sh.req-log /tmp/build/
