@@ -13,7 +13,8 @@ RUN apt-get update && \
 #
 RUN touch ${FFMPEG_SRCDIR}/_enable_if_available
 WORKDIR /tmp/build
-COPY ../min/_apt_install.sh /tmp/build
+COPY _apt_install.sh /tmp/build
+RUN chmod u+x /tmp/build/_apt_install.sh
 
 # ----------------------------------------------------------
 #
@@ -49,7 +50,6 @@ RUN echo --enable-libopencv >> ${FFMPEG_SRCDIR}/_enable_if_available
 #
 # ----------------------------------------------------------
 #
-RUN chmod u+x /tmp/build/_apt_install.sh
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} libssh-dev "" --enable-libssh
 RUN apt-get install ${__APT_Y} libgnutls28-dev
 RUN /tmp/build/_apt_install.sh ${FFMPEG_SRCDIR} ocl-icd-opencl-dev "" --enable-opencl
