@@ -58,7 +58,41 @@ RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
 RUN make install
 ```
 As mentioned above, the source tree, intermediate files, etc. are all left unerased, so you may want to clean them up.
-Also, you want to replace dependant packages -dev version to runtime version.
+Also, you want to replace dependant packages -dev version to runtime version. In that case, for example you can:
+
+```Dockerfile
+FROM hhsprings/ffmpeg-yours AS ffmpeg-yours
+
+# ...
+
+# 22.10==kinetic. Make it the same as the one in "ffmpeg-yours".
+FROM ubuntu:22.10
+WORKDIR /tmp/build
+COPY --from=ffmpeg-yours /usr/local /usr/local
+COPY --from=ffmpeg-yours /tmp/build/_apt_install.sh.req-log /tmp/build/
+
+# without noninteractive, "docker build" will stuck at (maybe) tzdata prompt.
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get -q update && apt-get -y --no-install-recommends upgrade
+
+ARG _PREFIX=/usr/local
+
+# at least, you must set LD_LIBRARY_PATH, and consider setting, for example,
+# "LADSPA_PATH" if necessary.
+ENV LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:${LD_LIBRARY_PATH:-/usr/lib64:/usr/lib}
+ENV PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH:-/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig}
+
+# "_apt_install.sh.req-log" contains all packages that I specified on "apt-get install"
+# explicitly. In some cases, the "-dev" version and the non- "-dev" version have different
+# names, so a simple replacement may not work. Here, if the installation of "non-dev version"
+# fails, simply install "-dev version".
+RUN for i in $(cat _apt_install.sh.req-log) ; do \
+    apt-get install -y -q --no-install-recommends $(echo $i | sed 's@-dev$@@') || \
+        apt-get install -y -q --no-install-recommends ${i} || true ; done
+
+# if you want
+#ENV DEBIAN_FRONTEND=readline
+```
 
 By the way, you can easily see the difference between /ffmpeg-yours and /ffmpeg-yours-min by reading my Dockerfile.
 
