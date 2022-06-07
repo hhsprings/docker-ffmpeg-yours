@@ -22,6 +22,7 @@ for _FFMPEG_VERSION in 4.4.2 3.4.11 4.1.9 4.2.7 4.3.4 ; do
                    --build-arg _BUILDPACKDEPS_TAG=${_BUILDPACKDEPS_TAG} \
                    --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION} \
                    --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX} \
+                   --platform linux/amd64 \
                    . || exit $?
             docker tag \
                    ${_YOU}/ffmpeg-yours-min:${_VER_MIN}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} \
