@@ -15,6 +15,7 @@ for _BUILDPACKDEPS_TAG in 22.10 22.04 ; do
            --build-arg _FFMPEG_VERSION=${_FFMPEG_VERSION} \
            --build-arg _OPENCV_VERSION=${_OPENCV_VERSION} \
            --build-arg _FFMPEG_EXTRA_VERSION_SUFFIX=${_FFMPEG_EXTRA_VERSION_SUFFIX} \
+           --platform linux/amd64 \
            . || exit $?
     if test "z${__dopush}" = "z1" ; then
         docker push ${_YOU}/ffmpeg-yours:${_VER_YOURS}-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} || exit $?
