@@ -30,12 +30,29 @@ RUN chmod u+x /tmp/build/_apt_install.sh
 # better to consider the overall balance, including the problem
 # of image build time.
 #
-# I thought I'd include text-related things (plus some essentials)
+# I thought I'd include text-related things (and some extra)
 # in this "small ffmpeg". It may be different from your way of
 # thinking. Even so, instead of asking me to change my mind, create
 # your own Docker image. The purpose of this project is not to provide
 # off-the-shelf products, but to "provide a template for you to create
 # ffmpeg for yourself".
+#
+# I decided to include "caca" and not "ffplay". The point of view of
+# this is "Do you think about using it only in the docker environment,
+# or do you think about using it outside the docker box?" The drawback
+# is that "caca" depends on third-party modules. However, it is very
+# convenient to visually check the video (even at rough resolutions)
+# when living only in docker. On the other hand, although ffplay is
+# the original distribution of FFMPEG, it is an application that is
+# not easy to run only in the docker environment. In my "configre"
+# I explicitly "--disable-ffplay", but in the first place, building
+# ffplay depends on a special set of packages that is different from
+# ffmpeg. The dependent module installation described in this Dockerfile
+# alone does not meet the conditions for building ffplay (so
+# "--enable-ffplay" is invalid). For example, if you install "libsdl2-dev",
+# ffplay will be the build target. It's up to you to extract the
+# resulting FFMPEG environment out of the Docker box. In that case,
+# if you want to build ffplay as well, do so.
 #
 # By the way, I have specified some auto-discovered options (lzma,
 # zlib, etc.) for clarity. Setting "--enable-" for something that
@@ -50,6 +67,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi
 RUN /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig
 RUN /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype
 RUN /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg
+RUN /tmp/build/_apt_install.sh "ffmpeg" libcaca-dev "" --enable-libcaca
 
 # download specific released version, not current snapshot via git.
 ADD https://ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz .
