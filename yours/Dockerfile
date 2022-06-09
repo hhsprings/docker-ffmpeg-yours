@@ -116,7 +116,6 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab
 RUN /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1
 RUN /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libcaca-dev "" --enable-libcaca
 RUN /tmp/build/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy
 RUN /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp
