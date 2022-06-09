@@ -49,6 +49,23 @@ RUN echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available
 #
 # ----------------------------------------------------------
 #
+# I excluded the ffplay build with "-min", but I want to target it here.
+# The easiest way to do this is to install "libsdl2-dev". Installing
+# "libsdl2-dev" not only affects "--enable-ffplay", but also involves
+# "--enable-sdl2" as well as "--enable-sndio", --enable-opengl. Also,
+# although not documented, "libavdevice/xv.c" seems to depend on the presence
+# or absence of "libxv1-dev", and the installation of "libsdl2-dev" enables
+# the build of "libavdevice/xv.c" as a result (this allows you to use
+# "-f xv"). It's actually hard to try to run them just inside the docker
+# container, but some "ffmpeg-yours" users may "copy and use the built
+# product". For those people, ffplay, sdl, and xv shouldn't be difficult
+# to get them working. (Even if you are a Windows user, I think you can
+# get it to work by extracting "/usr/local" from the docker container
+# and replicating it to the WSL2 environment.)
+RUN /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl"
+
+#
+#
 RUN /tmp/build/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh
 RUN /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" ""
 RUN /tmp/build/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl
@@ -134,6 +151,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d
 RUN /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264
 RUN /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq
 RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
+RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
 
 # ----------------------------------------------------------
 #
@@ -143,6 +161,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enab
 WORKDIR ${FFMPEG_SRCDIR}
 
 RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
+        sed "s@--disable-ffplay@--enable-ffplay@" | \
         sed "s@--extra-version=[^ ][^ ]* @--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX} @"` \
     --enable-gpl \
     --enable-version3 \
