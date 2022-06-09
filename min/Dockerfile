@@ -86,6 +86,7 @@ RUN sh configure \
     --disable-static \
     --enable-shared \
     --enable-pthreads \
+    --disable-debug \
     \
     --enable-iconv \
     \
