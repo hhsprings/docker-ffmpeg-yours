@@ -52,7 +52,7 @@ RUN echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available
 # I excluded the ffplay build with "-min", but I want to target it here.
 # The easiest way to do this is to install "libsdl2-dev". Installing
 # "libsdl2-dev" not only affects "--enable-ffplay", but also involves
-# "--enable-sdl2" as well as "--enable-sndio", --enable-opengl. Also,
+# "--enable-sdl2" as well as "--enable-sndio", "--enable-opengl". Also,
 # although not documented, "libavdevice/xv.c" seems to depend on the presence
 # or absence of "libxv1-dev", and the installation of "libsdl2-dev" enables
 # the build of "libavdevice/xv.c" as a result (this allows you to use
@@ -142,7 +142,14 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" \
 RUN /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm
 RUN /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp
 RUN /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2
+
+# "Lv2 is dead"? When I visit a site that claims to be a LV2 project, I can't
+# find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
+# information about "the lv2 plugin that ffmpeg  wants to use" is completely
+# obsolete. A least, I couldn't find a workable example at all.
 RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
+
+#
 RUN /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg
 RUN /tmp/build/_apt_install.sh "ffmpeg" libcodec2-dev "" --enable-libcodec2
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient
