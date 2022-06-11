@@ -13,7 +13,7 @@ This usage is not highly recommended.
 This is because you may find it unpleasant because the size has become huge as a result of enabling the function to the extent that it is close to the full spec.
 However, it's still worth it if you just want to try a filter that uses opencv, for example.
 
-Since the Dockerfile does not contain CMD or ENTRYPOINT, you can run the commands installed in the container. You can run ffmpeg and ffprobe as belonging to the FFMPEG project. I disabled ffplay.
+Since the Dockerfile does not contain CMD or ENTRYPOINT, you can run the commands installed in the container. You can run ffmpeg and ffprobe as belonging to the FFMPEG project. (I disabled ffplay on ffmpeg-yours-min.)
 
 For example:
 ```
