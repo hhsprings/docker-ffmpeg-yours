@@ -180,6 +180,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
 #
 # ----------------------------------------------------------
 # debian/ubuntu's package of AviSynthPlus doesn't exist.
+WORKDIR /tmp/build
 ADD https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz .
 
 RUN tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -fv v${_AVISYNTHPLUS_VERSION}.tar.gz
