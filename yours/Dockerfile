@@ -5,6 +5,7 @@ FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
 ARG _OPENCV_VERSION=3.4.15
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
+ARG _AVISYNTHPLUS_VERSION=3.7.2
 ARG __APT_Y="-yq --no-install-recommends"
 #
 RUN apt-get -q update && \
@@ -147,7 +148,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2
 # find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
 # information about "the lv2 plugin that ffmpeg  wants to use" is completely
 # obsolete. A least, I couldn't find a workable example at all.
-RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
+#RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
 
 #
 RUN /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg
@@ -159,6 +160,40 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264
 RUN /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq
 RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
 RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
+
+# ----------------------------------------------------------
+#
+# Regarding AviSynthPlus, both the official reference of ffmpeg and
+# AviSynthPlus's own description introduce "Installing only C/C++
+# header files". ffmpeg can enable "--enable-avisynth" with only these
+# headers. The scenario is that the end user can install AviSynthPlus
+# at any time he/she likes. But I choose to have "AviSynthPlus" installed
+# in this docker container. This decision doesn't mean much, so if you
+# don't like it, you can get rid of it yourself.
+#
+# Note that AviSynthPlus (unix variant build) at this time doesn't have
+# quite a lot of the original Windows-specific features available. For
+# example, "your first script" in "get started" doesn't work. This is
+# because "AviSource" is not available.
+# See https://github.com/AviSynth/AviSynthPlus/issues/162.
+#
+# ----------------------------------------------------------
+# debian/ubuntu's package of AviSynthPlus doesn't exist.
+ADD https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz
+
+RUN tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -fv v${_AVISYNTHPLUS_VERSION}.tar.gz
+ENV AVISYNTHPLUS_SRCDIR=/tmp/build/AviSynthPlus-${_AVISYNTHPLUS_VERSION}
+WORKDIR ${AVISYNTHPLUS_SRCDIR}
+RUN mkdir build
+WORKDIR ${AVISYNTHPLUS_SRCDIR}/build
+RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
+     cmake -D CMAKE_BUILD_TYPE=RELEASE \
+           -D BUILD_SHARED_LIBS=ON \
+           -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
+           .. && \
+         make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
+         make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available) || true
 
 # ----------------------------------------------------------
 #
