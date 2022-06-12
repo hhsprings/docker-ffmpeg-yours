@@ -147,7 +147,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2
 # "Lv2 is dead"? When I visit a site that claims to be a LV2 project, I can't
 # find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
 # information about "the lv2 plugin that ffmpeg  wants to use" is completely
-# obsolete. A least, I couldn't find a workable example at all.
+# obsolete. At least, I couldn't find a workable example at all.
 #RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
 
 #
