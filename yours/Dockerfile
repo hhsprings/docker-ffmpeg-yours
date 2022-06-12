@@ -160,6 +160,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264
 RUN /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq
 RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
 RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
+RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
 
 # ----------------------------------------------------------
 #
