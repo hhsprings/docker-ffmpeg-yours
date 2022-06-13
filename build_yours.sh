@@ -25,7 +25,7 @@ for _BUILDPACKDEPS_TAG in 22.10 22.04 ; do
            --platform linux/amd64 \
            -o type=image,push=${__push} \
            . || exit $?
-    if test $? -eq 0 ; then
+    if test $? -eq 0 && test ${__push} = "true" ; then
         docker run -t --rm ${r}:${t} ffmpeg -version
     fi
 done
