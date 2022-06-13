@@ -33,7 +33,7 @@ for _FFMPEG_VERSION in 4.4.2 3.4.11 4.1.9 4.2.7 4.3.4 ; do
                    -o type=image,push=${__push} \
                    . || exit $?
 
-            if test $? -eq 0 ; then
+            if test $? -eq 0 && test ${__push} = "true" ; then
                 docker run -t --rm ${r}:${t} ffmpeg -version
             fi
         fi
