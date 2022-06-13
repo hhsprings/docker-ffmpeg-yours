@@ -1,16 +1,45 @@
 #
-ARG _BUILDPACKDEPS_TAG=22.04
+ARG _BUILDPACKDEPS_TAG=22.10
 ARG _FFMPEG_VERSION=4.4.2
+
+# ----------------------------------------------------------
+#
+# build librav1e from source, because the version of librav1e
+# managed by apt does not match the version of librav1e
+# expected by ffmpeg to be built.
+# 
+# Since librav1e is written by the "RUST language", we need a
+# "RUST compiler" to build it, but the resulting librav1e does
+# not depend on "something like RUST runtimes". So, I will
+# build librav1e in another environment and copy only the binary.
+#
+# ----------------------------------------------------------
+FROM hhsprings/buildpack-deps-plus:latest-from-${_BUILDPACKDEPS_TAG} AS librav1e_build
+ARG _LIBRAV1E_VERSION=0.5.1
+RUN apt-get -q update
+RUN apt-get install -yq --no-install-recommends cargo nasm
+WORKDIR /tmp/build
+ADD https://github.com/xiph/rav1e/archive/refs/tags/v${_LIBRAV1E_VERSION}.tar.gz .
+RUN tar zxf v${_LIBRAV1E_VERSION}.tar.gz && rm -f v${_LIBRAV1E_VERSION}.tar.gz
+WORKDIR /tmp/build/rav1e-${_LIBRAV1E_VERSION}
+
+# OK on ubuntu:kinetic / NG on ubuntu:jammy
+RUN (cargo install cargo-c && cargo cinstall --release) || true
+
+# ----------------------------------------------------------
+#
+# The main subject ffmpeg build environment.
+#
+# ----------------------------------------------------------
 FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
 ARG _OPENCV_VERSION=3.4.15
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG _AVISYNTHPLUS_VERSION=3.7.2
-ARG __APT_Y="-yq --no-install-recommends"
 #
-RUN apt-get -q update && \
-    apt-get ${__APT_Y} upgrade
-
+RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
+COPY --from=librav1e_build /usr/local /usr/local
+RUN (if test -f /usr/local/lib/pkgconfig/rav1e.pc ; then echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; else true ; fi)
 #
 WORKDIR /tmp/build
 
@@ -68,7 +97,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-s
 #
 #
 RUN /tmp/build/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" ""
+RUN /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls"
 RUN /tmp/build/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl
 RUN /tmp/build/_apt_install.sh "ffmpeg" nvidia-opencl-dev "" --enable-opencl
 
@@ -209,8 +238,6 @@ RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
         sed "s@--extra-version=[^ ][^ ]* @--extra-version=${_FFMPEG_EXTRA_VERSION_SUFFIX} @"` \
     --enable-gpl \
     --enable-version3 \
-    \
-    --enable-gnutls \
     \
     $(grep "^ffmpeg:" /tmp/build/_enable_if_available | sed 's@^ffmpeg:@@')
 
