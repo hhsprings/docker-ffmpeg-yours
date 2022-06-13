@@ -64,7 +64,7 @@ RUN (\
          echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
      else true ; fi)
 RUN (\
-     if test -f /usr/local/lib/pkgconfig/lensfun.pc ; then \
+     if test -f /usr/local/lib/liblensfun.so ; then \
          echo ffmpeg:--enable-liblensfun >> /tmp/build/_enable_if_available ; \
      else true ; fi)
 #
