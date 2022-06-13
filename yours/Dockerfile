@@ -4,8 +4,8 @@ ARG _FFMPEG_VERSION=4.4.2
 
 # ----------------------------------------------------------
 #
-# build librav1e from source, because the version
-# of it managed by apt does not match the version expected by
+# build librav1e, and liblensfun from source, because the version
+# of these managed by apt does not match the version expected by
 # ffmpeg to be built.
 # 
 # Since librav1e is written by the "RUST language", we need a
@@ -13,10 +13,15 @@ ARG _FFMPEG_VERSION=4.4.2
 # not depend on "something like RUST runtimes". So, I will
 # build librav1e in another environment and copy only the binary.
 #
+# Although liblensfun itself has no special dependencies, the
+# version selection that ffmpeg expects is strange. If these special
+# circumstances pollute the ffmpeg build environment of the main
+# subject, it will be difficult to manage, so I will treat this
+# as well as librav1e.
+#
 # ----------------------------------------------------------
 FROM hhsprings/buildpack-deps-plus:latest-from-${_BUILDPACKDEPS_TAG} AS librav1e_build
 ARG _LIBRAV1E_VERSION=0.5.1
-ARG _LIBLENSFUN_VERSION=0.2.6
 RUN apt-get -q update
 
 # librav1e
@@ -27,6 +32,18 @@ RUN tar zxf v${_LIBRAV1E_VERSION}.tar.gz && rm -f v${_LIBRAV1E_VERSION}.tar.gz
 WORKDIR /tmp/build/rav1e-${_LIBRAV1E_VERSION}
 # OK on ubuntu:kinetic / NG on ubuntu:jammy
 RUN (cargo install cargo-c && cargo cinstall --release) || true
+
+# liblensfun
+WORKDIR /tmp/build
+ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
+ADD https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip .
+RUN unzip ${_LIBLENSFUN_SSVERSION}.zip && rm -f v${_LIBLENSFUN_SSVERSION}.zip
+WORKDIR /tmp/build/lensfun-${_LIBLENSFUN_SSVERSION}
+RUN (\
+     mkdir build ; cd build ; \
+     cmake -D CMAKE_BUILD_TYPE=Release .. && \
+         make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
+         make install) || true
 
 # ----------------------------------------------------------
 #
@@ -44,6 +61,10 @@ COPY --from=librav1e_build /usr/local /usr/local
 RUN (\
      if test -f /usr/local/lib/pkgconfig/rav1e.pc ; then \
          echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
+     else true ; fi)
+RUN (\
+     if test -f /usr/local/lib/pkgconfig/lensfun.pc ; then \
+         echo ffmpeg:--enable-liblensfun >> /tmp/build/_enable_if_available ; \
      else true ; fi)
 #
 WORKDIR /tmp/build
