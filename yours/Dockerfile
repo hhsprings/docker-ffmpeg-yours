@@ -193,23 +193,38 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libcodec2-dev "" --enable-libcodec2 \
     )
 
+RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" libbs2b-dev "" --enable-libbs2b ; \
+     /tmp/build/_apt_install.sh "ffmpeg" "libtesseract-dev libleptonica-dev tesseract-ocr-eng" "" --enable-libtesseract ; \
+     /tmp/build/_apt_install.sh "ffmpeg" flite1-dev "" --enable-libflite ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libchromaprint-dev "" --enable-chromaprint ; \
+     /tmp/build/_apt_install.sh "ffmpeg" librubberband-dev "" --enable-librubberband ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libzimg-dev "" --enable-libzimg ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libsoxr-dev "" --enable-libsoxr ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libmysofa-dev "" --enable-libmysofa ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libgme-dev "" --enable-libgme ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libgsm1-dev "" --enable-libgsm ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc ; \
+     if grep "^-vulkan$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi ; \
+     if grep "^-libglslang$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp ; \
+     /tmp/build/_apt_install.sh "ffmpeg" "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm ; \
+     /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg ; \
+     if grep "^-librabbitmq$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24 ; \
+     /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" \
+    )
+
 #
-RUN /tmp/build/_apt_install.sh "ffmpeg" libbs2b-dev "" --enable-libbs2b
 # frei0r-plugins-dev don't install /usr/lib/frei0r-1 files.
 RUN /tmp/build/_apt_install.sh "ffmpeg" "frei0r-plugins-dev frei0r-plugins" "" --enable-frei0r
 ENV FREI0R_PATH=/usr/lib/frei0r-1
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" \
-    "libtesseract-dev libleptonica-dev tesseract-ocr-eng" "" --enable-libtesseract
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" flite1-dev "" --enable-libflite
-RUN /tmp/build/_apt_install.sh "ffmpeg" libchromaprint-dev "" --enable-chromaprint
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" librubberband-dev "" --enable-librubberband
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" libzimg-dev "" --enable-libzimg
-RUN /tmp/build/_apt_install.sh "ffmpeg" libsoxr-dev "" --enable-libsoxr
-RUN /tmp/build/_apt_install.sh "ffmpeg" libmysofa-dev "" --enable-libmysofa
 
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN (\
@@ -223,35 +238,11 @@ RUN (\
 # Environment variable for /usr/bin/listplugins, etc.
 ENV LADSPA_PATH=/usr/lib/ladspa
 
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgme-dev "" --enable-libgme
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgsm1-dev "" --enable-libgsm
-RUN /tmp/build/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt
-RUN /tmp/build/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug
-RUN /tmp/build/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc
-RUN if grep "^-vulkan$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi
-RUN if grep "^-libglslang$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab
-RUN /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp
-
-RUN /tmp/build/_apt_install.sh "ffmpeg" \
-    "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx
-RUN /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm
-
 # "Lv2 is dead"? When I visit a site that claims to be a LV2 project, I can't
 # find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
 # information about "the lv2 plugin that ffmpeg  wants to use" is completely
 # obsolete. At least, I couldn't find a workable example at all.
 #RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
-
-#
-RUN /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg
-
-RUN if grep "^-librabbitmq$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
-RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx"
 
 # ----------------------------------------------------------
 #
