@@ -75,6 +75,29 @@ WORKDIR /tmp/build
 
 # ----------------------------------------------------------
 #
+# build libilbc from source. no deb package of this.
+#
+# ----------------------------------------------------------
+ARG _ABSEIL_VERSION=20211102.0
+ARG _LIBILBC_VERSION=3.0.4
+RUN (\
+     if grep "^-libilbc$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+         wget https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
+             tar zxf ${_ABSEIL_VERSION}.tar.gz && rm -f ${_ABSEIL_VERSION}.tar.gz && \
+             wget https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
+             tar zxf v${_LIBILBC_VERSION}.tar.gz && rm -f v${_LIBILBC_VERSION}.tar.gz && \
+             (cd abseil-cpp-${_ABSEIL_VERSION} && \
+                  mkdir build && cd build && \
+                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
+             (cd libilbc-${_LIBILBC_VERSION} && \
+                  mkdir build && cd build && \
+                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
+             echo ffmpeg:--enable-libilbc >> /tmp/build/_enable_if_available ; \
+     else true ; fi \
+    ) || true
+
+# ----------------------------------------------------------
+#
 # build opencv from source, because libopencv-dev of apt
 # is broken or at least CRAZY in my humble opinion.
 #
