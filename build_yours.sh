@@ -1,7 +1,7 @@
 #! /bin/sh
 export __push=$(if test "z${1:-''}" = "z--push" ; then echo true ; else echo false ; fi)
 export _YOU=${_YOU:-hhsprings}
-export _VER_YOURS=0.8.5
+export _VER_YOURS=0.8.6
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION=4.4.2
 export _OPENCV_VERSION=3.4.15
