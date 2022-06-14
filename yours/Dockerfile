@@ -59,7 +59,11 @@ ARG _AVISYNTHPLUS_VERSION=3.7.2
 RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
 COPY --from=librav1e_build /usr/local /usr/local
 RUN (\
-     if test -f /usr/local/lib/pkgconfig/rav1e.pc ; then \
+     sh ${FFMPEG_SRCDIR}/configure --help | grep "^  *--.*able-" | grep -v = | \
+         awk '{gsub(/--.*able-/, "-"); print $1}' | \
+         sort -u > ${FFMPEG_SRCDIR}/_cfg_able)
+RUN (\
+     if test -f /usr/local/lib/pkgconfig/rav1e.pc && grep "^-librav1e$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
          echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
      else true ; fi)
 RUN (\
@@ -118,18 +122,23 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl"
 
 #
-#
-RUN /tmp/build/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls"
 RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl ; \
      /tmp/build/_apt_install.sh "ffmpeg" nvidia-opencl-dev "" --enable-opencl \
     )
 
 #
-RUN /tmp/build/_apt_install.sh "ffmpeg" libsrt-gnutls-dev "" --enable-libsrt
+RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls" ; \
+     if grep "^-librist$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist ; else true ; fi ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray ; \
+     /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libsrt-gnutls-dev "" --enable-libsrt ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libzmq5-dev "" --enable-libzmq \
+    )
 
-#
 RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libx264-dev "" --enable-libx264 ; \
      /tmp/build/_apt_install.sh "ffmpeg" libx265-dev "" --enable-libx265 ; \
@@ -137,7 +146,7 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libwebp-dev "" --enable-libwebp ; \
      /tmp/build/_apt_install.sh "ffmpeg" libaom-dev "" --enable-libaom ; \
      /tmp/build/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ; \
+     if grep "^-libsvtav1$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ;  else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
      /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
      /tmp/build/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
@@ -170,15 +179,13 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libchromaprint-dev "" --enable-chromapri
 
 RUN /tmp/build/_apt_install.sh "ffmpeg" librubberband-dev "" --enable-librubberband
 
-RUN /tmp/build/_apt_install.sh "ffmpeg" libzmq5-dev "" --enable-libzmq
 RUN /tmp/build/_apt_install.sh "ffmpeg" libzimg-dev "" --enable-libzimg
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsoxr-dev "" --enable-libsoxr
 RUN /tmp/build/_apt_install.sh "ffmpeg" libmysofa-dev "" --enable-libmysofa
 
-#
-RUN /tmp/build/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa ; \
      apt-get install ${__APT_Y} csladspa || true ; \
      apt-get install ${__APT_Y} bs2b-ladspa || true ; \
      apt-get install ${__APT_Y} guitarix-ladspa || true ; \
@@ -194,18 +201,16 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libgsm1-dev "" --enable-libgsm
 RUN /tmp/build/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt
 RUN /tmp/build/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug
 RUN /tmp/build/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc
-RUN /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan
-RUN /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang
+RUN if grep "^-vulkan$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi
+RUN if grep "^-libglslang$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi
 RUN /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab
 RUN /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy
 RUN /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp
 RUN /tmp/build/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse
 RUN /tmp/build/_apt_install.sh "ffmpeg" \
     "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx
 RUN /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm
-RUN /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp
 
 # "Lv2 is dead"? When I visit a site that claims to be a LV2 project, I can't
 # find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
@@ -215,14 +220,12 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp
 
 #
 RUN /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg
-RUN /tmp/build/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient
-RUN /tmp/build/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist
-RUN /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq
+
+RUN if grep "^-librabbitmq$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi
 RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
 RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
 RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
-#RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx"
-RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev" "" "--enable-omx"
+RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx"
 
 # ----------------------------------------------------------
 #
