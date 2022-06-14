@@ -258,6 +258,11 @@ RUN (\
 #
 # ----------------------------------------------------------
 WORKDIR ${FFMPEG_SRCDIR}
+# apply SVT-AV1's patch, if any (there is no patch for ffmpeg 5.1)
+RUN (\
+     (cd .. ; git clone https://github.com/AOMediaCodec/SVT-AV1.git) ; \
+     for p in ../SVT-AV1/ffmpeg_plugin/n`basename \`pwd\` | sed 's@ffmpeg-\(.*\)\.[0-9]*$@\1@'`/*.patch ; \
+     do patch -p1 < "$p" ; done) ; if $? -eq 0 ; then rm -fr SVT-AV1 ; else true ; fi
 
 RUN sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
         sed "s@--disable-ffplay@--enable-ffplay@" | \
