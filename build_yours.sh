@@ -8,6 +8,7 @@ export _OPENCV_VERSION=3.4.15
 
 cd yours
 for _BUILDPACKDEPS_TAG in 22.10 22.04 ; do
+    docker buildx prune -a -f
 
     export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
     r="${_YOU}/ffmpeg-yours"
