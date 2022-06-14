@@ -119,7 +119,12 @@ RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
 # to get them working. (Even if you are a Windows user, I think you can
 # get it to work by extracting "/usr/local" from the docker container
 # and replicating it to the WSL2 environment.)
-RUN /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl"
+RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl" ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
+     /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 \
+    )
 
 #
 RUN (\
@@ -207,7 +212,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab
 RUN /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi
 RUN /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy
 RUN /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp
-RUN /tmp/build/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse
+
 RUN /tmp/build/_apt_install.sh "ffmpeg" \
     "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx
 RUN /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm
@@ -222,8 +227,6 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm
 RUN /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg
 
 RUN if grep "^-librabbitmq$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi
-RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394
-RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
 RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
 RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx"
 
