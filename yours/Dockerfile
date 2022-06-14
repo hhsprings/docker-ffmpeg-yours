@@ -222,6 +222,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enab
 RUN /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack
 RUN /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24
 #RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx"
+RUN /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev" "" "--enable-omx"
 
 # ----------------------------------------------------------
 #
