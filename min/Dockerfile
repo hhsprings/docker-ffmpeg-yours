@@ -59,15 +59,17 @@ RUN chmod u+x /tmp/build/_apt_install.sh
 # is detected as "available" by auto-discovery has no effect on
 # the execution of the final FFMPEG other than the banner output.
 # ----------------------------------------------------------
-RUN /tmp/build/_apt_install.sh "ffmpeg" zlib1g-dev "" --enable-zlib
-RUN /tmp/build/_apt_install.sh "ffmpeg" liblzma-dev "" --enable-lzma
-RUN /tmp/build/_apt_install.sh "ffmpeg" libxml2-dev "" --enable-libxml2
-RUN /tmp/build/_apt_install.sh "ffmpeg" libass-dev "" --enable-libass
-RUN /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi
-RUN /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig
-RUN /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype
-RUN /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg
-RUN /tmp/build/_apt_install.sh "ffmpeg" libcaca-dev "" --enable-libcaca
+RUN (\
+     /tmp/build/_apt_install.sh "ffmpeg" zlib1g-dev "" --enable-zlib ; \
+     /tmp/build/_apt_install.sh "ffmpeg" liblzma-dev "" --enable-lzma ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libxml2-dev "" --enable-libxml2 ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libass-dev "" --enable-libass ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg ; \
+     /tmp/build/_apt_install.sh "ffmpeg" libcaca-dev "" --enable-libcaca \
+    )
 
 # download specific released version, not current snapshot via git.
 ADD https://ffmpeg.org/releases/ffmpeg-${_FFMPEG_VERSION}.tar.xz .
@@ -77,7 +79,7 @@ ENV FFMPEG_SRCDIR=/tmp/build/ffmpeg-${_FFMPEG_VERSION}
 WORKDIR ${FFMPEG_SRCDIR}
 
 #
-ENV LD_LIBRARY_PATH=${_PREFIX}/lib64:${_PREFIX}/lib:${LD_LIBRARY_PATH:-/usr/lib64:/usr/lib}
+ENV LD_LIBRARY_PATH=${_PREFIX}/lib64:${_PREFIX}/lib:${LD_LIBRARY_PATH:-/usr/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib}
 ENV PKG_CONFIG_PATH=${_PREFIX}/lib64/pkgconfig:${_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH:-/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig}
 
 #
