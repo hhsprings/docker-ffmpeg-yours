@@ -298,8 +298,24 @@ RUN (\
         \
         $(grep "^ffmpeg:" /tmp/build/_enable_if_available | sed 's@^ffmpeg:@@') && \
          make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
-         make install \
+         make install && \
+         make alltools \
     )
+# The "tools" folder contains truly "chunky" tools. Some of them
+# are unrelated to ffmpeg usage and are rather useful only to
+# ffmpeg developers, while others are also valuable to general
+# users, such as "graph2dot" which is also referenced from the
+# official documentation. Everything contained here is almost
+# undocumented. Even if it exists, it is only the comments in the
+# source code. Therefore, these are "only used by those who understand"
+# and are not supposed to be installed. However, I don't want
+# "graph2dot" etc. to be ignored by that policy. Therefore, I decided
+# to include this built tools folder in "PATH". Again, there are many
+# tools in this that are of no value to you. If you don't understand
+# how to use it, I recommend that you do not try to use it forcibly.
+# (Especially, "trasher" is dangerous tool, so if you don't understand
+# it by reading source code, NEVER use it.)
+ENV PATH+=:${FFMPEG_SRCDIR}/tools
 # -------------------------------------------------------
 
 # ----------------------------------------------------------
