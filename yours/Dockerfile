@@ -315,7 +315,7 @@ RUN (\
 # how to use it, I recommend that you do not try to use it forcibly.
 # (Especially, "trasher" is dangerous tool, so if you don't understand
 # it by reading source code, NEVER use it.)
-ENV PATH+=:${FFMPEG_SRCDIR}/tools
+ENV PATH=${PATH}:${FFMPEG_SRCDIR}/tools
 # -------------------------------------------------------
 
 # ----------------------------------------------------------
