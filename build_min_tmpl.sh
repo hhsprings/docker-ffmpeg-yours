@@ -2,7 +2,7 @@
 suites=${1}
 export __push=$(if test "z${2:-''}" = "z--push" ; then echo true ; else echo false ; fi)
 export _YOU=${_YOU:-hhsprings}
-export _VER_MIN=${_VER_MIN:-0.5.2}
+export _VER_MIN=${_VER_MIN:-0.5.3}
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 cd min
