@@ -147,6 +147,7 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
      /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
      /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
+     /tmp/build/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 ; \
      /tmp/build/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio \
     )
 
