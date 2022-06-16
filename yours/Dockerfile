@@ -337,7 +337,7 @@ RUN (\
                git checkout ${_UAVS3D_SSVER} ; \
                mkdir build/linux ; \
                cd build/linux ; \
-               cmake -D BUILD_SHARED_LIBS=1 .. && \
+               cmake -D BUILD_SHARED_LIBS=1 ../.. && \
                    make install && \
                    echo ffmpeg:--enable-libuavs3d >> /tmp/build/_enable_if_available \
               ) && rm -fr uavs3d \
