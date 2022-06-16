@@ -92,6 +92,7 @@ RUN (\
              (cd libilbc-${_LIBILBC_VERSION} && \
                   mkdir build && cd build && \
                   cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
+             rm -fr libilbc-${_LIBILBC_VERSION} abseil-cpp-${_ABSEIL_VERSION} ; \
              echo ffmpeg:--enable-libilbc >> /tmp/build/_enable_if_available ; \
      else true ; fi \
     ) || true
@@ -105,22 +106,25 @@ RUN (\
 # opencv from source
 RUN /tmp/build/_apt_install.sh "ffmpeg" libgtk2.0-dev "" ""
 
-# download specific released version, not current snapshot via git.
-ADD https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz .
-
-RUN tar zxf ${_OPENCV_VERSION}.tar.gz && rm -fv ${_OPENCV_VERSION}.tar.gz
-ENV OPENCV_SRCDIR=/tmp/build/opencv-${_OPENCV_VERSION}
-WORKDIR ${OPENCV_SRCDIR}/build
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
-RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
-    -D BUILD_SHARED_LIBS=ON \
-    -D ENABLE_PIC=ON \
-    -D OPENCV_GENERATE_PKGCONFIG=ON \
-    -D BUILD_TESTS=OFF \
-    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
-    .. && \
-    make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install && \
-    echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available
+RUN (\
+     wget https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz && \
+         tar zxf ${_OPENCV_VERSION}.tar.gz && rm -f ${_OPENCV_VERSION}.tar.gz && \
+         mkdir -p opencv-${_OPENCV_VERSION}/build && \
+         (\
+          cd opencv-${_OPENCV_VERSION}/build && \
+              cmake -D CMAKE_BUILD_TYPE=RELEASE \
+                    -D BUILD_SHARED_LIBS=ON \
+                    -D ENABLE_PIC=ON \
+                    -D OPENCV_GENERATE_PKGCONFIG=ON \
+                    -D BUILD_TESTS=OFF \
+                    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
+                    .. && \
+              make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install && \
+              echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available \
+         ) ; \
+     rm -fr opencv-${_OPENCV_VERSION}
+    )
 
 # ----------------------------------------------------------
 #
@@ -265,19 +269,22 @@ ENV LADSPA_PATH=/usr/lib/ladspa
 # ----------------------------------------------------------
 # debian/ubuntu's package of AviSynthPlus doesn't exist.
 WORKDIR /tmp/build
-ADD https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz .
 
-RUN tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -fv v${_AVISYNTHPLUS_VERSION}.tar.gz
-ENV AVISYNTHPLUS_SRCDIR=/tmp/build/AviSynthPlus-${_AVISYNTHPLUS_VERSION}
-WORKDIR ${AVISYNTHPLUS_SRCDIR}/build
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
-     cmake -D CMAKE_BUILD_TYPE=RELEASE \
-           -D BUILD_SHARED_LIBS=ON \
-           -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
-           .. && \
-         make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
-         make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available) || true
+     wget https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
+         tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -f v${_AVISYNTHPLUS_VERSION}.tar.gz && \
+         mkdir -p AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
+         /tmp/build/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
+         (\
+          cd AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
+              cmake -D CMAKE_BUILD_TYPE=RELEASE \
+                    -D BUILD_SHARED_LIBS=ON \
+                    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
+                    .. && \
+              make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
+              make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available \
+         ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} \
+    ) || true
 
 # ----------------------------------------------------------
 #
