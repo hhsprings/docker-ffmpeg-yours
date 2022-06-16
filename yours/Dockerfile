@@ -313,7 +313,7 @@ RUN (\
      else true ; fi ; \
      if grep "^-libdavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
          (\
-          apt-get install -yq nasm \;
+          apt-get install -yq nasm ; \
           git clone https://github.com/pkuvcl/davs2.git && \
               (\
                cd davs2/build/linux ; \
