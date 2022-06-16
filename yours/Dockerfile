@@ -71,6 +71,58 @@ RUN (\
      fi \
     ) || true
 
+# "AVS"-related. Is AVS the Chinese standard? I don't know if this is
+# popular at all, but at least I'm sure it's "confused" about the
+# relationship between FFMPEG and AVS:
+#
+#   libxavs: AVS encoder (no DEB package, http://xavs.sourceforge.net/)
+#   libxavs2: AVS2 encoder (It is registered in the DEB package.)
+#   libdavs2: AVS2 decoder (no DEB package, https://github.com/pkuvcl/davs2)
+#   libuavs3d: AVS3 decoder (no DEB package, https://github.com/uavs3/uavs3d)
+#
+# No AVS decoder, and no AVS3 encoder. In addition, ffmpeg follows
+# the HEAD of the git repository instead of these release versions,
+# which is very difficult to manage. Being able to use only the
+# encoder is "nuisance", and even if you can only use the decoder,
+# this is meaningless unless you "have video encoded with it". It
+# would be worthless to apply libxavs without a corresponding decoder.
+# It would be very unpleasant for us to apply libxavs2 because it's
+# easy to apply, and not libdavs2 because it's not. I'm not sure if
+# it's worth applying libuavs3d without a corresponding encoder.
+# I don't know how popular it is. At least I've never seen a video
+# encoded with this.
+ARG _DAVS2_SSVER=b06d7585620f4e90a6d19a2926bb4e59793b8942
+ARG _UAVS3D_SSVER=04d603d1a27ad924a1a9a02d2893fb3ae1ed67ad
+RUN (\
+     if grep "^-libdavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
+         (\
+          git clone https://github.com/pkuvcl/davs2.git && \
+              (\
+               cd davs2 ; \
+               git checkout ${_DAVS2_SSVER} ; \
+               cd build/linux ; \
+               ./configure --enable-shared --disable-static && \
+                   make install && \
+                   echo ffmpeg:--enable-libdavs2 >> /tmp/build/_enable_if_available \
+              ) \
+         ) ; \
+     fi ; \
+     if grep "^-libuavs3d$" /tmp/build/_ffmpeg_cfg_able ; then \
+         (\
+          git clone https://github.com/uavs3/uavs3d.git && \
+              (\
+               cd uavs3d ; \
+               git checkout ${_UAVS3D_SSVER} ; \
+               mkdir build/linux ; \
+               cd build/linux ; \
+               cmake -D BUILD_SHARED_LIBS=1 ../.. && \
+                   make install && \
+                   echo ffmpeg:--enable-libuavs3d >> /tmp/build/_enable_if_available \
+              ) \
+         ) ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
@@ -170,11 +222,14 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libwebp-dev "" --enable-libwebp ; \
      /tmp/build/_apt_install.sh "ffmpeg" libaom-dev "" --enable-libaom ; \
      /tmp/build/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
-     if grep "^-libsvtav1$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ;  else true ; fi ; \
+     if grep "^-libsvtav1$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ; else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
      /tmp/build/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
      /tmp/build/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264 \
+     /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264 ; \
+     if grep "^-libxavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
+         /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
+     else true ; fi \
     )
 RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libmp3lame-dev "" --enable-libmp3lame ; \
@@ -273,67 +328,6 @@ RUN (\
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
               make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available \
          ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} \
-    ) || true
-
-# ----------------------------------------------------------
-#
-# "AVS"-related. Is AVS the Chinese standard? I don't know if this is
-# popular at all, but at least I'm sure it's "confused" about the
-# relationship between FFMPEG and AVS:
-#
-#   libxavs: AVS encoder (no DEB package, http://xavs.sourceforge.net/)
-#   libxavs2: AVS2 encoder (It is registered in the DEB package.)
-#   libdavs2: AVS2 decoder (no DEB package, https://github.com/pkuvcl/davs2)
-#   libuavs3d: AVS3 decoder (no DEB package, https://github.com/uavs3/uavs3d)
-#
-# No AVS decoder, and no AVS3 encoder. In addition, ffmpeg follows
-# the HEAD of the git repository instead of these release versions,
-# which is very difficult to manage. Being able to use only the
-# encoder is "nuisance", and even if you can only use the decoder,
-# this is meaningless unless you "have video encoded with it". It
-# would be worthless to apply libxavs without a corresponding decoder.
-# It would be very unpleasant for us to apply libxavs2 because it's
-# easy to apply, and not libdavs2 because it's not. I'm not sure if
-# it's worth applying libuavs3d without a corresponding encoder.
-# I don't know how popular it is. At least I've never seen a video
-# encoded with this.
-#
-# ----------------------------------------------------------
-ARG _DAVS2_SSVER=b06d7585620f4e90a6d19a2926bb4e59793b8942
-ARG _UAVS3D_SSVER=04d603d1a27ad924a1a9a02d2893fb3ae1ed67ad
-RUN (\
-     if grep "^-libxavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
-         /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
-     else true ; fi ; \
-     apt-get install -yq nasm ; \
-     if grep "^-libdavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
-         (\
-          git clone https://github.com/pkuvcl/davs2.git && \
-              (\
-               cd davs2 ; \
-               git checkout ${_DAVS2_SSVER} ; \
-               cd build/linux ; \
-               ./configure --enable-shared --disable-static && \
-                   make install && \
-                   echo ffmpeg:--enable-libdavs2 >> /tmp/build/_enable_if_available \
-              ) && rm -fr davs2 \
-         ) ; \
-     else true ; fi ; \
-     if grep "^-libuavs3d$" /tmp/build/_ffmpeg_cfg_able ; then \
-         (\
-          git clone https://github.com/uavs3/uavs3d.git && \
-              (\
-               cd uavs3d ; \
-               git checkout ${_UAVS3D_SSVER} ; \
-               mkdir build/linux ; \
-               cd build/linux ; \
-               cmake -D BUILD_SHARED_LIBS=1 ../.. && \
-                   make install && \
-                   echo ffmpeg:--enable-libuavs3d >> /tmp/build/_enable_if_available \
-              ) && rm -fr uavs3d \
-         ) ; \
-     else true ; fi ; \
-     apt-get remove -yq nasm \
     ) || true
 
 # ----------------------------------------------------------
