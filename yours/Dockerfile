@@ -182,7 +182,6 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
      if grep "^-libsvtav1$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ;  else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
      /tmp/build/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
      /tmp/build/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d ; \
      /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264 \
@@ -284,6 +283,47 @@ RUN (\
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
               make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available \
          ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} \
+    ) || true
+
+# ----------------------------------------------------------
+#
+# "AVS"-related. Is AVS the Chinese standard? I don't know if this is
+# popular at all, but at least I'm sure it's "confused" about the
+# relationship between FFMPEG and AVS:
+#
+#   libxavs: AVS encoder (no DEB package, http://xavs.sourceforge.net/)
+#   libxavs2: AVS2 encoder (It is registered in the DEB package.)
+#   libdavs2: AVS2 decoder (no DEB package, https://github.com/pkuvcl/davs2)
+#   libuavs3d: AVS3 decoder (no DEB package, https://github.com/uavs3/uavs3d)
+#
+# No AVS decoder, and no AVS3 encoder. Being able to use only the
+# encoder is "nuisance", and even if you can only use the decoder,
+# this is meaningless unless you "have video encoded with it". It
+# would be worthless to apply libxavs without a corresponding decoder.
+# It would be very unpleasant for us to apply libxavs2 because it's
+# easy to apply, and not libdavs2 because it's not. I'm not sure if
+# it's worth applying libuavs3d without a corresponding encoder.
+# I don't know how popular it is. At least I've never seen a video
+# encoded with this.
+#
+# ----------------------------------------------------------
+RUN (\
+     if grep "^-libxavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+         /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
+     else true ; fi ; \
+     if grep "^-libdavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+         (\
+          apt-get install -yq nasm \;
+          git clone https://github.com/pkuvcl/davs2.git && \
+              (\
+               cd davs2/build/linux ; \
+               ./configure --enable-shared --disable-static && \
+                   make install && \
+                   echo ffmpeg:--enable-libdavs2 >> /tmp/build/_enable_if_available \
+              ) && rm -fr davs2 \
+          apt-get remove -yq nasm \
+         ) ; \
+     else true ; fi \
     ) || true
 
 # ----------------------------------------------------------
