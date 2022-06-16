@@ -123,6 +123,20 @@ RUN (\
      fi \
     ) || true
 
+# libklvanc (no DEB package, and has no release version...)
+ARG _LIBKLVANC_SSVER=74f01b7982a7caa18c800f14df30ca74cf142955
+RUN (\
+     if grep "^-libklvanc$" /tmp/build/_ffmpeg_cfg_able ; then \
+         git clone https://github.com/stoth68000/libklvanc.git && \
+             cd libklvanc/ && \
+             git checkout ${_LIBKLVANC_SSVER} && \
+             (./autogen.sh --build && \
+                  ./configure --enable-shared --disable-static && \
+                  make install) && \
+             echo ffmpeg:--enable-libklvanc >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
