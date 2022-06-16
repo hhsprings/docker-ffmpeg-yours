@@ -296,7 +296,9 @@ RUN (\
 #   libdavs2: AVS2 decoder (no DEB package, https://github.com/pkuvcl/davs2)
 #   libuavs3d: AVS3 decoder (no DEB package, https://github.com/uavs3/uavs3d)
 #
-# No AVS decoder, and no AVS3 encoder. Being able to use only the
+# No AVS decoder, and no AVS3 encoder. In addition, ffmpeg follows
+# the HEAD of the git repository instead of these release versions,
+# which is very difficult to manage. Being able to use only the
 # encoder is "nuisance", and even if you can only use the decoder,
 # this is meaningless unless you "have video encoded with it". It
 # would be worthless to apply libxavs without a corresponding decoder.
@@ -307,23 +309,41 @@ RUN (\
 # encoded with this.
 #
 # ----------------------------------------------------------
+ARG _DAVS2_SSVER=b06d7585620f4e90a6d19a2926bb4e59793b8942
+ARG _UAVS3D_SSVER=04d603d1a27ad924a1a9a02d2893fb3ae1ed67ad
 RUN (\
      if grep "^-libxavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
          /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
      else true ; fi ; \
+     apt-get install -yq nasm ; \
      if grep "^-libdavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
          (\
-          apt-get install -yq nasm ; \
           git clone https://github.com/pkuvcl/davs2.git && \
               (\
-               cd davs2/build/linux ; \
+               cd davs2 ; \
+               git checkout ${_DAVS2_SSVER} ; \
+               cd build/linux ; \
                ./configure --enable-shared --disable-static && \
                    make install && \
                    echo ffmpeg:--enable-libdavs2 >> /tmp/build/_enable_if_available \
               ) && rm -fr davs2 \
-          apt-get remove -yq nasm \
          ) ; \
-     else true ; fi \
+     else true ; fi ; \
+     if grep "^-libuavs3d$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+         (\
+          git clone https://github.com/uavs3/uavs3d.git && \
+              (\
+               cd uavs3d ; \
+               git checkout ${_UAVS3D_SSVER} ; \
+               mkdir build/linux ; \
+               cd build/linux ; \
+               cmake -D BUILD_SHARED_LIBS=1 .. && \
+                   make install && \
+                   echo ffmpeg:--enable-libuavs3d >> /tmp/build/_enable_if_available \
+              ) && rm -fr uavs3d \
+         ) ; \
+     else true ; fi ; \
+     apt-get remove -yq nasm \
     ) || true
 
 # ----------------------------------------------------------
