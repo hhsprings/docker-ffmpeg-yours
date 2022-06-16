@@ -44,7 +44,7 @@ ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
 RUN (\
      if grep "^-liblensfun$" /tmp/build/_ffmpeg_cfg_able ; then \
          wget https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
-             unzip ${_LIBLENSFUN_SSVERSION}.zip && mkdir lensfun-${_LIBLENSFUN_SSVERSION}/build && \
+             unzip -qq ${_LIBLENSFUN_SSVERSION}.zip && mkdir lensfun-${_LIBLENSFUN_SSVERSION}/build && \
              (cd lensfun-${_LIBLENSFUN_SSVERSION}/build && \
                   (cmake -D CMAKE_BUILD_TYPE=Release .. && \
                        make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install)) && \
@@ -134,6 +134,20 @@ RUN (\
                   ./configure --enable-shared --disable-static && \
                   make install) && \
              echo ffmpeg:--enable-libklvanc >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
+
+# libkvazaar (no DEB package, and autogen.sh requires git clone)
+ARG _LIBKVAZAAR_SSVER=cc22233117a90cb66b057024eb174aacc942a134
+RUN (\
+     if grep "^-libkvazaar$" /tmp/build/_ffmpeg_cfg_able ; then \
+         git clone https://github.com/ultravideo/kvazaar.git && \
+             cd kvazaar/ && \
+             git checkout ${_LIBKVAZAAR_SSVER} && \
+             (./autogen.sh && \
+                  ./configure --enable-shared --disable-static && \
+                  make $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
+             echo ffmpeg:--enable-libkvazaar >> /tmp/build/_enable_if_available ; \
      fi \
     ) || true
 
