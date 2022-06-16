@@ -123,7 +123,7 @@ RUN (\
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install && \
               echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available \
          ) ; \
-     rm -fr opencv-${_OPENCV_VERSION}
+     rm -fr opencv-${_OPENCV_VERSION} \
     )
 
 # ----------------------------------------------------------
