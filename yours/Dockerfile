@@ -4,46 +4,53 @@ ARG _FFMPEG_VERSION=4.4.2
 
 # ----------------------------------------------------------
 #
-# build librav1e, and liblensfun from source, because the version
+# build some third-party libraries from source, because the version
 # of these managed by apt does not match the version expected by
-# ffmpeg to be built.
+# ffmpeg to be built, or because no deb package of it. 
 # 
-# Since librav1e is written by the "RUST language", we need a
-# "RUST compiler" to build it, but the resulting librav1e does
-# not depend on "something like RUST runtimes". So, I will
-# build librav1e in another environment and copy only the binary.
-#
-# Although liblensfun itself has no special dependencies, the
-# version selection that ffmpeg expects is strange. If these special
-# circumstances pollute the ffmpeg build environment of the main
-# subject, it will be difficult to manage, so I will treat this
-# as well as librav1e.
-#
 # ----------------------------------------------------------
+FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG} AS ffmpeg_base
+RUN (\
+     sh ${FFMPEG_SRCDIR}/configure --help | grep "^  *--.*able-" | grep -v = | \
+         awk '{gsub(/--[endis]*able-/, "-"); print $1}' | \
+         sort -u > /tmp/build/_ffmpeg_cfg_able)
+#
 FROM hhsprings/buildpack-deps-plus:latest-from-${_BUILDPACKDEPS_TAG} AS librav1e_build
 ARG _LIBRAV1E_VERSION=0.5.1
 RUN apt-get -q update
+RUN apt-get install -yq --no-install-recommends nasm
 
-# librav1e
-RUN apt-get install -yq --no-install-recommends cargo nasm
+COPY --from=ffmpeg_base /tmp/build/_ffmpeg_cfg_able /tmp/build/_ffmpeg_cfg_able
+
 WORKDIR /tmp/build
-ADD https://github.com/xiph/rav1e/archive/refs/tags/v${_LIBRAV1E_VERSION}.tar.gz .
-RUN tar zxf v${_LIBRAV1E_VERSION}.tar.gz && rm -f v${_LIBRAV1E_VERSION}.tar.gz
-WORKDIR /tmp/build/rav1e-${_LIBRAV1E_VERSION}
-# OK on ubuntu:kinetic / NG on ubuntu:jammy
-RUN (cargo install cargo-c && cargo cinstall --release) || true
+
+# librav1e (OK on ubuntu:kinetic / NG on ubuntu:jammy)
+#     librav1e is written by the "RUST language", we need a
+#     "RUST compiler" to build it, but the resulting librav1e
+#     does not depend on "something like RUST runtimes".
+RUN (\
+     if grep "^-librav1e$" /tmp/build/_ffmpeg_cfg_able ; then \
+         apt-get install -yq --no-install-recommends cargo ; \
+         wget https://github.com/xiph/rav1e/archive/refs/tags/v${_LIBRAV1E_VERSION}.tar.gz && \
+             tar zxf v${_LIBRAV1E_VERSION}.tar.gz && rm -f v${_LIBRAV1E_VERSION}.tar.gz && \
+             (cd rav1e-${_LIBRAV1E_VERSION} && \
+                  (cargo install cargo-c && cargo cinstall --release)) && \
+             echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
 
 # liblensfun
-WORKDIR /tmp/build
 ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
-ADD https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip .
-RUN unzip ${_LIBLENSFUN_SSVERSION}.zip && rm -f v${_LIBLENSFUN_SSVERSION}.zip
-WORKDIR /tmp/build/lensfun-${_LIBLENSFUN_SSVERSION}
 RUN (\
-     mkdir build ; cd build ; \
-     cmake -D CMAKE_BUILD_TYPE=Release .. && \
-         make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
-         make install) || true
+     if grep "^-liblensfun$" /tmp/build/_ffmpeg_cfg_able ; then \
+         wget https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
+             unzip ${_LIBLENSFUN_SSVERSION}.zip && mkdir lensfun-${_LIBLENSFUN_SSVERSION}/build && \
+             (cd lensfun-${_LIBLENSFUN_SSVERSION}/build && \
+                  (cmake -D CMAKE_BUILD_TYPE=Release .. && \
+                       make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install)) && \
+             echo ffmpeg:--enable-liblensfun >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
 
 # ----------------------------------------------------------
 #
@@ -57,21 +64,9 @@ ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG _AVISYNTHPLUS_VERSION=3.7.2
 #
 RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
-COPY --from=librav1e_build /usr/local /usr/local
-RUN (\
-     sh ${FFMPEG_SRCDIR}/configure --help | grep "^  *--.*able-" | grep -v = | \
-         awk '{gsub(/--.*able-/, "-"); print $1}' | \
-         sort -u > ${FFMPEG_SRCDIR}/_cfg_able)
-RUN (\
-     if test -f /usr/local/lib/pkgconfig/rav1e.pc && grep "^-librav1e$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
-         echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
-     else true ; fi)
-RUN (\
-     if test -f /usr/local/lib/pkgconfig/lensfun.pc ; then \
-         echo ffmpeg:--enable-liblensfun >> /tmp/build/_enable_if_available ; \
-     else true ; fi)
-#
 WORKDIR /tmp/build
+COPY --from=librav1e_build /usr/local /usr/local
+COPY --from=librav1e_build /tmp/build/_* /tmp/build
 
 # ----------------------------------------------------------
 #
@@ -81,7 +76,7 @@ WORKDIR /tmp/build
 ARG _ABSEIL_VERSION=20211102.0
 ARG _LIBILBC_VERSION=3.0.4
 RUN (\
-     if grep "^-libilbc$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+     if grep "^-libilbc$" /tmp/build/_ffmpeg_cfg_able ; then \
          wget https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
              tar zxf ${_ABSEIL_VERSION}.tar.gz && rm -f ${_ABSEIL_VERSION}.tar.gz && \
              wget https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
@@ -164,7 +159,7 @@ RUN (\
 #
 RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls" ; \
-     if grep "^-librist$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist ; else true ; fi ; \
+     if grep "^-librist$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist ; else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray ; \
      /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp ; \
      /tmp/build/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient ; \
@@ -180,7 +175,7 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libwebp-dev "" --enable-libwebp ; \
      /tmp/build/_apt_install.sh "ffmpeg" libaom-dev "" --enable-libaom ; \
      /tmp/build/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
-     if grep "^-libsvtav1$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ;  else true ; fi ; \
+     if grep "^-libsvtav1$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ;  else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
      /tmp/build/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
      /tmp/build/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d ; \
@@ -212,8 +207,8 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt ; \
      /tmp/build/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug ; \
      /tmp/build/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc ; \
-     if grep "^-vulkan$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi ; \
-     if grep "^-libglslang$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi ; \
+     if grep "^-vulkan$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi ; \
+     if grep "^-libglslang$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab ; \
      /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy ; \
@@ -221,7 +216,7 @@ RUN (\
      /tmp/build/_apt_install.sh "ffmpeg" "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx ; \
      /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm ; \
      /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg ; \
-     if grep "^-librabbitmq$" ${FFMPEG_SRCDIR}/_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi ; \
+     if grep "^-librabbitmq$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi ; \
      /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24 ; \
      /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" \
     )
@@ -312,11 +307,11 @@ RUN (\
 ARG _DAVS2_SSVER=b06d7585620f4e90a6d19a2926bb4e59793b8942
 ARG _UAVS3D_SSVER=04d603d1a27ad924a1a9a02d2893fb3ae1ed67ad
 RUN (\
-     if grep "^-libxavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+     if grep "^-libxavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
          /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
      else true ; fi ; \
      apt-get install -yq nasm ; \
-     if grep "^-libdavs2$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+     if grep "^-libdavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
          (\
           git clone https://github.com/pkuvcl/davs2.git && \
               (\
@@ -329,7 +324,7 @@ RUN (\
               ) && rm -fr davs2 \
          ) ; \
      else true ; fi ; \
-     if grep "^-libuavs3d$" ${FFMPEG_SRCDIR}/_cfg_able ; then \
+     if grep "^-libuavs3d$" /tmp/build/_ffmpeg_cfg_able ; then \
          (\
           git clone https://github.com/uavs3/uavs3d.git && \
               (\
