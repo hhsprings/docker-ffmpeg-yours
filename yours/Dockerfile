@@ -52,6 +52,25 @@ RUN (\
      fi \
     ) || true
 
+# libilbc (no deb package of this.)
+ARG _ABSEIL_VERSION=20211102.0
+ARG _LIBILBC_VERSION=3.0.4
+RUN (\
+     if grep "^-libilbc$" /tmp/build/_ffmpeg_cfg_able ; then \
+         wget https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
+             tar zxf ${_ABSEIL_VERSION}.tar.gz && \
+             wget https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
+             tar zxf v${_LIBILBC_VERSION}.tar.gz && \
+             (cd abseil-cpp-${_ABSEIL_VERSION} && \
+                  mkdir build && cd build && \
+                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
+             (cd libilbc-${_LIBILBC_VERSION} && \
+                  mkdir build && cd build && \
+                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
+             echo ffmpeg:--enable-libilbc >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
@@ -67,30 +86,6 @@ RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
 WORKDIR /tmp/build
 COPY --from=librav1e_build /usr/local /usr/local
 COPY --from=librav1e_build /tmp/build/_* /tmp/build
-
-# ----------------------------------------------------------
-#
-# build libilbc from source. no deb package of this.
-#
-# ----------------------------------------------------------
-ARG _ABSEIL_VERSION=20211102.0
-ARG _LIBILBC_VERSION=3.0.4
-RUN (\
-     if grep "^-libilbc$" /tmp/build/_ffmpeg_cfg_able ; then \
-         wget https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
-             tar zxf ${_ABSEIL_VERSION}.tar.gz && rm -f ${_ABSEIL_VERSION}.tar.gz && \
-             wget https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
-             tar zxf v${_LIBILBC_VERSION}.tar.gz && rm -f v${_LIBILBC_VERSION}.tar.gz && \
-             (cd abseil-cpp-${_ABSEIL_VERSION} && \
-                  mkdir build && cd build && \
-                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
-             (cd libilbc-${_LIBILBC_VERSION} && \
-                  mkdir build && cd build && \
-                  cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
-             rm -fr libilbc-${_LIBILBC_VERSION} abseil-cpp-${_ABSEIL_VERSION} ; \
-             echo ffmpeg:--enable-libilbc >> /tmp/build/_enable_if_available ; \
-     else true ; fi \
-    ) || true
 
 # ----------------------------------------------------------
 #
