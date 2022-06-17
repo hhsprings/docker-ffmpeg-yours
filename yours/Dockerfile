@@ -146,7 +146,7 @@ RUN (\
              git checkout ${_LIBKVAZAAR_SSVER} && \
              (./autogen.sh && \
                   ./configure --enable-shared --disable-static && \
-                  make $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
+                  make -j $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
              echo ffmpeg:--enable-libkvazaar >> /tmp/build/_enable_if_available ; \
      fi \
     ) || true
