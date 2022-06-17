@@ -31,7 +31,7 @@ WORKDIR /tmp/build
 RUN (\
      if grep "^-librav1e$" /tmp/build/_ffmpeg_cfg_able ; then \
          apt-get install -yq --no-install-recommends cargo ; \
-         wget https://github.com/xiph/rav1e/archive/refs/tags/v${_LIBRAV1E_VERSION}.tar.gz && \
+         wget -q https://github.com/xiph/rav1e/archive/refs/tags/v${_LIBRAV1E_VERSION}.tar.gz && \
              tar zxf v${_LIBRAV1E_VERSION}.tar.gz && rm -f v${_LIBRAV1E_VERSION}.tar.gz && \
              (cd rav1e-${_LIBRAV1E_VERSION} && \
                   (cargo install cargo-c && cargo cinstall --release)) && \
@@ -43,7 +43,7 @@ RUN (\
 ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
 RUN (\
      if grep "^-liblensfun$" /tmp/build/_ffmpeg_cfg_able ; then \
-         wget https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
+         wget -q https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
              unzip -qq ${_LIBLENSFUN_SSVERSION}.zip && mkdir lensfun-${_LIBLENSFUN_SSVERSION}/build && \
              (cd lensfun-${_LIBLENSFUN_SSVERSION}/build && \
                   (cmake -D CMAKE_BUILD_TYPE=Release .. && \
@@ -57,9 +57,9 @@ ARG _ABSEIL_VERSION=20211102.0
 ARG _LIBILBC_VERSION=3.0.4
 RUN (\
      if grep "^-libilbc$" /tmp/build/_ffmpeg_cfg_able ; then \
-         wget https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
+         wget -q https://github.com/abseil/abseil-cpp/archive/refs/tags/${_ABSEIL_VERSION}.tar.gz && \
              tar zxf ${_ABSEIL_VERSION}.tar.gz && \
-             wget https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
+             wget -q https://github.com/TimothyGu/libilbc/archive/refs/tags/v${_LIBILBC_VERSION}.tar.gz && \
              tar zxf v${_LIBILBC_VERSION}.tar.gz && \
              (cd abseil-cpp-${_ABSEIL_VERSION} && \
                   mkdir build && cd build && \
@@ -178,7 +178,7 @@ RUN /tmp/build/_apt_install.sh "ffmpeg" libgtk2.0-dev "" ""
 
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
 RUN (\
-     wget https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz && \
+     wget -q https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz && \
          tar zxf ${_OPENCV_VERSION}.tar.gz && rm -f ${_OPENCV_VERSION}.tar.gz && \
          mkdir -p opencv-${_OPENCV_VERSION}/build && \
          (\
@@ -343,7 +343,7 @@ ENV LADSPA_PATH=/usr/lib/ladspa
 WORKDIR /tmp/build
 
 RUN (\
-     wget https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
+     wget -q https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
          tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -f v${_AVISYNTHPLUS_VERSION}.tar.gz && \
          mkdir -p AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
          /tmp/build/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
