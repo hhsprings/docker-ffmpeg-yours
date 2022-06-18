@@ -16,8 +16,9 @@ RUN (\
          sort -u > /tmp/build/_ffmpeg_cfg_able)
 #
 FROM hhsprings/buildpack-deps-plus:latest-from-${_BUILDPACKDEPS_TAG} AS librav1e_build
+ARG _ENABLE_SHADERC=false
 ARG _LIBRAV1E_VERSION=0.5.1
-RUN apt-get -q update
+RUN apt-get -qq update
 RUN apt-get install -yq --no-install-recommends nasm
 
 COPY --from=ffmpeg_base /tmp/build/_ffmpeg_cfg_able /tmp/build/_ffmpeg_cfg_able
@@ -167,6 +168,28 @@ RUN (\
      fi \
     ) || true
 
+# libshaderc (no DEB package)
+#     NOTE: libshaderc and libglslang are mutually exclusive
+ARG _LIBSHADERC_SSVER=7e2cfcf2b75c245fa3ceaf2e276180cbf8f107ea
+RUN (\
+     if test "x${_ENABLE_SHADERC}" = "xtrue" && grep "^-libshaderc$" /tmp/build/_ffmpeg_cfg_able ; then \
+         apt-get install -yqq --no-install-recommends ninja-build && \
+             git clone https://github.com/google/shaderc && \
+             (\
+                 cd shaderc && \
+                     git checkout ${_LIBSHADERC_SSVER} && \
+                     ./utils/git-sync-deps && \
+                     mkdir build && (\
+                         cd build && \
+                             cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DSHADERC_SKIP_TESTS=ON -DSHADERC_SKIP_EXAMPLES=ON .. && \
+                             ninja -j $(grep "^core id" /proc/cpuinfo | wc -l) install \
+                     ) \
+             ) && \
+             echo ffmpeg:--enable-libshaderc >> /tmp/build/_enable_if_available && \
+             sed -i 's@^-libglslang$@@' /tmp/build/_ffmpeg_cfg_able ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
@@ -178,7 +201,7 @@ ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG _AVISYNTHPLUS_VERSION=3.7.2
 #
-RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
+RUN apt-get -qq update && apt-get -yq --no-install-recommends upgrade
 WORKDIR /tmp/build
 COPY --from=librav1e_build /usr/local /usr/local
 COPY --from=librav1e_build /tmp/build/_* /tmp/build
