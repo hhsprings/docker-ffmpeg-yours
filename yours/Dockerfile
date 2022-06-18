@@ -151,6 +151,22 @@ RUN (\
      fi \
     ) || true
 
+# libjxl (no DEB package)
+#     NOTE: libjxl depends on libgflags
+ARG _LIBJXL_SSVER=c4262565e8de611f593bf2c6f4a24aeb55d38afb
+RUN (\
+     if grep "^-libjxl$" /tmp/build/_ffmpeg_cfg_able ; then \
+         apt-get install -yq --no-install-recommends libgflags-dev ; \
+         git clone https://github.com/libjxl/libjxl.git --recursive --shallow-submodules && \
+             cd libjxl/ && \
+             git checkout ${_LIBJXL_SSVER} && \
+             (mkdir build && cd build && \
+                  cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF .. && \
+                  make -j $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
+             echo ffmpeg:--enable-libjxl >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
@@ -167,6 +183,9 @@ WORKDIR /tmp/build
 COPY --from=librav1e_build /usr/local /usr/local
 COPY --from=librav1e_build /tmp/build/_* /tmp/build
 ARG _WDT=/tmp/build
+
+# libjxl depends on libgflags.
+RUN (grep -- --enable-libjxl ${_WDT}/_enable_if_available && apt-get install -yq --no-install-recommends libgflags2.2) || true
 
 # ----------------------------------------------------------
 #
