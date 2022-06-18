@@ -315,7 +315,10 @@ RUN (\
      ${_WDT}/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg ; \
      grep "^-librabbitmq$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; \
      grep "^-libaribb24$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24 ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" ; \
+     grep "^-libplacebo$" ${_WDT}/_ffmpeg_cfg_able && \
+         expr `apt-cache policy libplacebo-dev | grep Candidate | awk '{print $2}'` '>=' '4.192.0' && \
+         ${_WDT}/_apt_install.sh "ffmpeg" libplacebo-dev "" --libplacebo \
     ) || true
 
 #
