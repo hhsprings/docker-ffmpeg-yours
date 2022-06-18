@@ -166,6 +166,7 @@ RUN apt-get -q update && apt-get -yq --no-install-recommends upgrade
 WORKDIR /tmp/build
 COPY --from=librav1e_build /usr/local /usr/local
 COPY --from=librav1e_build /tmp/build/_* /tmp/build
+ARG _WDT=/tmp/build
 
 # ----------------------------------------------------------
 #
@@ -174,7 +175,7 @@ COPY --from=librav1e_build /tmp/build/_* /tmp/build
 #
 # ----------------------------------------------------------
 # opencv from source
-RUN /tmp/build/_apt_install.sh "ffmpeg" libgtk2.0-dev "" ""
+RUN ${_WDT}/_apt_install.sh "ffmpeg" libgtk2.0-dev "" ""
 
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
 RUN (\
@@ -191,7 +192,7 @@ RUN (\
                     -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
                     .. && \
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install && \
-              echo ffmpeg:--enable-libopencv >> /tmp/build/_enable_if_available \
+              echo ffmpeg:--enable-libopencv >> ${_WDT}/_enable_if_available \
          ) ; \
      rm -fr opencv-${_OPENCV_VERSION} \
     )
@@ -217,96 +218,95 @@ RUN (\
 # get it to work by extracting "/usr/local" from the docker container
 # and replicating it to the WSL2 environment.)
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl" ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio \
-    )
+     ${_WDT}/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl" ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio \
+    ) || true
 
 #
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl ; \
-     /tmp/build/_apt_install.sh "ffmpeg" nvidia-opencl-dev "" --enable-opencl \
-    )
+     ${_WDT}/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" nvidia-opencl-dev "" --enable-opencl \
+    ) || true
 
 #
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls" ; \
-     if grep "^-librist$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist ; else true ; fi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray ; \
-     /tmp/build/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libsrt-gnutls-dev "" --enable-libsrt ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libzmq5-dev "" --enable-libzmq \
-    )
+     ${_WDT}/_apt_install.sh "ffmpeg" libgnutls28-dev "" "--enable-gnutls" ; \
+     grep "^-librist$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" librist-dev "" --enable-librist ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libbluray-dev "" --enable-libbluray ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" librtmp-dev "" --enable-librtmp ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libsmbclient-dev "" --enable-libsmbclient ; \
+     grep "^-libsrt$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libsrt-gnutls-dev "" --enable-libsrt ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libssh-dev "" --enable-libssh ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libzmq5-dev "" --enable-libzmq \
+    ) || true
 
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libx264-dev "" --enable-libx264 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libx265-dev "" --enable-libx265 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libvpx-dev "" --enable-libvpx ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libwebp-dev "" --enable-libwebp ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libaom-dev "" --enable-libaom ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
-     if grep "^-libsvtav1$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ; else true ; fi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264 ; \
-     if grep "^-libxavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
-         /tmp/build/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 ; \
-     else true ; fi \
-    )
-RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libmp3lame-dev "" --enable-libmp3lame ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libtwolame-dev "" --enable-libtwolame ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopus-dev "" --enable-libopus ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libvorbis-dev "" --enable-libvorbis ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libshine-dev "" --enable-libshine ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libspeex-dev "" --enable-libspeex ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopencore-amrwb-dev "" --enable-libopencore-amrwb ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopencore-amrnb-dev "" --enable-libopencore-amrnb ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libcodec2-dev "" --enable-libcodec2 \
-    )
+     ${_WDT}/_apt_install.sh "ffmpeg" libx264-dev "" --enable-libx264 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libx265-dev "" --enable-libx265 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libvpx-dev "" --enable-libvpx ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libwebp-dev "" --enable-libwebp ; \
+     grep "^-libaom$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libaom-dev "" --enable-libaom ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libtheora-dev "" --enable-libtheora ; \
+     grep "^-libsvtav1$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libsvtav1enc-dev "" --enable-libsvtav1 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libxvidcore-dev "" --enable-libxvid ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libmfx-dev "" --enable-libmfx ; \
+     grep "^-libdav1d$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libdav1d-dev "" --enable-libdav1d ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libopenh264-dev "" --enable-libopenh264 ; \
+     grep "^-libxavs2$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libxavs2-dev "" --enable-libxavs2 \
+    ) || true
 
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" libbs2b-dev "" --enable-libbs2b ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libtesseract-dev libleptonica-dev tesseract-ocr-eng" "" --enable-libtesseract ; \
-     /tmp/build/_apt_install.sh "ffmpeg" flite1-dev "" --enable-libflite ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libchromaprint-dev "" --enable-chromaprint ; \
-     /tmp/build/_apt_install.sh "ffmpeg" librubberband-dev "" --enable-librubberband ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libzimg-dev "" --enable-libzimg ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libsoxr-dev "" --enable-libsoxr ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libmysofa-dev "" --enable-libmysofa ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libgme-dev "" --enable-libgme ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libgsm1-dev "" --enable-libgsm ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc ; \
-     if grep "^-vulkan$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; else true ; fi ; \
-     if grep "^-libglslang$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; else true ; fi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm ; \
-     /tmp/build/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg ; \
-     if grep "^-librabbitmq$" /tmp/build/_ffmpeg_cfg_able ; then /tmp/build/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; else true ; fi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" \
-    )
+     ${_WDT}/_apt_install.sh "ffmpeg" libmp3lame-dev "" --enable-libmp3lame ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libtwolame-dev "" --enable-libtwolame ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libopus-dev "" --enable-libopus ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libvorbis-dev "" --enable-libvorbis ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libshine-dev "" --enable-libshine ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libspeex-dev "" --enable-libspeex ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libopencore-amrwb-dev "" --enable-libopencore-amrwb ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libopencore-amrnb-dev "" --enable-libopencore-amrnb ; \
+     grep "^-libcodec2$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libcodec2-dev "" --enable-libcodec2 \
+    ) || true
+
+RUN (\
+     ${_WDT}/_apt_install.sh "ffmpeg" libbs2b-dev "" --enable-libbs2b ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libtesseract-dev libleptonica-dev tesseract-ocr-eng" "" --enable-libtesseract ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" flite1-dev "" --enable-libflite ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libchromaprint-dev "" --enable-chromaprint ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" librubberband-dev "" --enable-librubberband ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libzimg-dev "" --enable-libzimg ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libsoxr-dev "" --enable-libsoxr ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libmysofa-dev "" --enable-libmysofa ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libgme-dev "" --enable-libgme ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libgsm1-dev "" --enable-libgsm ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libopenmpt-dev "" --enable-libopenmpt ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libmodplug-dev "" --enable-libmodplug ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libvo-amrwbenc-dev "" --enable-libvo-amrwbenc ; \
+     grep "^-vulkan$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libvulkan-dev "" --enable-vulkan ; \
+     grep "^-libglslang$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" glslang-dev "" --enable-libglslang ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libvidstab-dev "" --enable-libvidstab ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libzvbi-dev "" --enable-libzvbi ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libsnappy-dev "" --enable-libsnappy ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libgmp-dev "" --enable-gmp ; \
+     grep "^-pocketsphinx$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" "libpocketsphinx-dev pocketsphinx-en-us" "" --enable-pocketsphinx ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" libdrm-dev "" --enable-libdrm ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" librsvg2-dev "" --enable-librsvg ; \
+     grep "^-librabbitmq$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" librabbitmq-dev "" --enable-librabbitmq ; \
+     grep "^-libaribb24$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" libaribb24-dev "" --enable-libaribb24 ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" \
+    ) || true
 
 #
 # frei0r-plugins-dev don't install /usr/lib/frei0r-1 files.
-RUN /tmp/build/_apt_install.sh "ffmpeg" "frei0r-plugins-dev frei0r-plugins" "" --enable-frei0r
+RUN ${_WDT}/_apt_install.sh "ffmpeg" "frei0r-plugins-dev frei0r-plugins" "" --enable-frei0r
 ENV FREI0R_PATH=/usr/lib/frei0r-1
 
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa ; \
      apt-get install ${__APT_Y} csladspa || true ; \
      apt-get install ${__APT_Y} bs2b-ladspa || true ; \
      apt-get install ${__APT_Y} guitarix-ladspa || true ; \
@@ -320,7 +320,7 @@ ENV LADSPA_PATH=/usr/lib/ladspa
 # find any "/plugins"  available in this ffmpeg lv2 filter. So at least the
 # information about "the lv2 plugin that ffmpeg  wants to use" is completely
 # obsolete. At least, I couldn't find a workable example at all.
-#RUN /tmp/build/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2
+#RUN (grep "^-lv2$" ${_WDT}/_ffmpeg_cfg_able && ${_WDT}/_apt_install.sh "ffmpeg" "liblilv-dev lilv-utils" "" --enable-lv2) || true
 
 # ----------------------------------------------------------
 #
@@ -346,7 +346,7 @@ RUN (\
      wget -q https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
          tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -f v${_AVISYNTHPLUS_VERSION}.tar.gz && \
          mkdir -p AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
-         /tmp/build/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
+         ${_WDT}/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
          (\
           cd AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
               cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -354,7 +354,7 @@ RUN (\
                     -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
                     .. && \
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
-              make install && echo ffmpeg:--enable-avisynth >> /tmp/build/_enable_if_available \
+              make install && echo ffmpeg:--enable-avisynth >> ${_WDT}/_enable_if_available \
          ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} \
     ) || true
 
@@ -377,7 +377,7 @@ RUN (\
         --enable-gpl \
         --enable-version3 \
         \
-        $(grep "^ffmpeg:" /tmp/build/_enable_if_available | sed 's@^ffmpeg:@@') && \
+        $(grep "^ffmpeg:" ${_WDT}/_enable_if_available | sed 's@^ffmpeg:@@') && \
          make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
          make install && \
          make alltools ; rm -f tools/*.[od] \
