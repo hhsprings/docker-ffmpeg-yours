@@ -253,14 +253,10 @@ RUN (\
 # although not documented, "libavdevice/xv.c" seems to depend on the presence
 # or absence of "libxv1-dev", and the installation of "libsdl2-dev" enables
 # the build of "libavdevice/xv.c" as a result (this allows you to use
-# "-f xv"). It's actually hard to try to run them just inside the docker
-# container, but some "ffmpeg-yours" users may "copy and use the built
-# product". For those people, ffplay, sdl, and xv shouldn't be difficult
-# to get them working. (Even if you are a Windows user, I think you can
-# get it to work by extracting "/usr/local" from the docker container
-# and replicating it to the WSL2 environment.)
+# "-f xv").
 RUN (\
      ${_WDT}/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl" ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libv4l-dev" "" "--enable-libv4l2" ; \
      ${_WDT}/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
      ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
      ${_WDT}/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
