@@ -265,7 +265,8 @@ RUN (\
      ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
      ${_WDT}/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
      ${_WDT}/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libopenal-dev libopenal-data" "" "--enable-openal" \
     ) || true
 
 #
