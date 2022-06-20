@@ -7,7 +7,7 @@ export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
 export _FFMPEG_VERSION_FOR_LATEST=4.4.2
 cd min
 
-for _FFMPEG_VERSION in 4.4.2 3.4.11 4.1.9 4.2.7 4.3.4 ; do
+for _FFMPEG_VERSION in 5.0.1 4.4.2 3.4.11 4.1.9 4.2.7 4.3.4 ; do
     for _BUILDPACKDEPS_TAG in ${suites} ; do
 
         export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_MIN}-min
