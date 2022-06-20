@@ -190,6 +190,18 @@ RUN (\
      fi \
     ) || true
 
+# lcms2 (Newer than the DEB package is needed.)
+ARG _LCMS2_VERSION=2.13.1
+RUN (\
+     if grep "^-lcms2$" /tmp/build/_ffmpeg_cfg_able ; then \
+         wget -q https://github.com/mm2/Little-CMS/archive/refs/tags/lcms${_LCMS2_VERSION}.tar.gz && \
+             tar zxf lcms${_LCMS2_VERSION}.tar.gz && rm -f lcms${_LCMS2_VERSION}.tar.gz && \
+             (cd Little-CMS-lcms${_LCMS2_VERSION} && \
+                  (./configure --enable-shared --disable-static && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install)) && \
+             echo ffmpeg:--enable-lcms2 >> /tmp/build/_enable_if_available ; \
+     fi \
+    ) || true
+
 # ----------------------------------------------------------
 #
 # The main subject ffmpeg build environment.
