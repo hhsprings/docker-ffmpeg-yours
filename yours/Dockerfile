@@ -266,8 +266,9 @@ RUN (\
 # or absence of "libxv1-dev", and the installation of "libsdl2-dev" enables
 # the build of "libavdevice/xv.c" as a result (this allows you to use
 # "-f xv").
+RUN ${_WDT}/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl"
+     
 RUN (\
-     ${_WDT}/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl" ; \
      ${_WDT}/_apt_install.sh "ffmpeg" "libv4l-dev" "" "--enable-libv4l2" ; \
      ${_WDT}/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
      ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
