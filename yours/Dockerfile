@@ -232,7 +232,7 @@ COPY --from=librav1e_build /tmp/build/_* /tmp/build
 ARG _WDT=/tmp/build
 
 # libjxl depends on libgflags.
-RUN (grep -- --enable-libjxl ${_WDT}/_enable_if_available && apt-get install -yq --no-install-recommends libgflags2.2) || true
+RUN (if grep -- --enable-libjxl ${_WDT}/_enable_if_available ; then apt-get install -yq --no-install-recommends libgflags2.2 ; else true ; fi)
 
 # ----------------------------------------------------------
 #
