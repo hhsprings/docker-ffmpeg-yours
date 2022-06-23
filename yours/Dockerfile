@@ -37,8 +37,9 @@ RUN (\
              (cd rav1e-${_LIBRAV1E_VERSION} && \
                   (cargo install cargo-c && cargo cinstall --release)) && \
              echo ffmpeg:--enable-librav1e >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # liblensfun
 ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
@@ -50,8 +51,9 @@ RUN (\
                   (cmake -D CMAKE_BUILD_TYPE=Release .. && \
                        make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install)) && \
              echo ffmpeg:--enable-liblensfun >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # libilbc (no deb package of this.)
 ARG _ABSEIL_VERSION=20211102.0
@@ -69,8 +71,9 @@ RUN (\
                   mkdir build && cd build && \
                   cmake .. && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install) && \
              echo ffmpeg:--enable-libilbc >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # "AVS"-related. Is AVS the Chinese standard? I don't know if this is
 # popular at all, but at least I'm sure it's "confused" about the
@@ -107,7 +110,10 @@ RUN (\
                    echo ffmpeg:--enable-libdavs2 >> /tmp/build/_enable_if_available \
               ) \
          ) ; \
+     else true ; \
      fi ; \
+    )
+RUN (\
      if grep "^-libuavs3d$" /tmp/build/_ffmpeg_cfg_able ; then \
          (\
           git clone https://github.com/uavs3/uavs3d.git && \
@@ -121,8 +127,9 @@ RUN (\
                    echo ffmpeg:--enable-libuavs3d >> /tmp/build/_enable_if_available \
               ) \
          ) ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # libklvanc (no DEB package, and has no release version...)
 ARG _LIBKLVANC_SSVER=74f01b7982a7caa18c800f14df30ca74cf142955
@@ -135,8 +142,9 @@ RUN (\
                   ./configure --enable-shared --disable-static && \
                   make install) && \
              echo ffmpeg:--enable-libklvanc >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # libkvazaar (no DEB package, and autogen.sh requires git clone)
 ARG _LIBKVAZAAR_SSVER=cc22233117a90cb66b057024eb174aacc942a134
@@ -149,8 +157,9 @@ RUN (\
                   ./configure --enable-shared --disable-static && \
                   make -j $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
              echo ffmpeg:--enable-libkvazaar >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # libjxl (no DEB package)
 #     NOTE: libjxl depends on libgflags
@@ -165,8 +174,9 @@ RUN (\
                   cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF .. && \
                   make -j $(grep "^core id" /proc/cpuinfo | wc -l) install) && \
              echo ffmpeg:--enable-libjxl >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # libshaderc (no DEB package)
 #     NOTE: libshaderc and libglslang are mutually exclusive
@@ -187,8 +197,9 @@ RUN (\
              ) && \
              echo ffmpeg:--enable-libshaderc >> /tmp/build/_enable_if_available && \
              sed -i 's@^-libglslang$@@' /tmp/build/_ffmpeg_cfg_able ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # lcms2 (Newer than the DEB package is needed.)
 ARG _LCMS2_VERSION=2.13.1
@@ -199,8 +210,9 @@ RUN (\
              (cd Little-CMS-lcms${_LCMS2_VERSION} && \
                   (./configure --enable-shared --disable-static && make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install)) && \
              echo ffmpeg:--enable-lcms2 >> /tmp/build/_enable_if_available ; \
+     else true ; \
      fi \
-    ) || true
+    )
 
 # ----------------------------------------------------------
 #
