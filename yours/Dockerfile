@@ -269,20 +269,20 @@ RUN (\
 RUN ${_WDT}/_apt_install.sh "ffmpeg" libsdl2-dev "" "--enable-sdl2 --enable-sndio --enable-opengl"
      
 RUN (\
-     ${_WDT}/_apt_install.sh "ffmpeg" "libv4l-dev" "" "--enable-libv4l2" ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 ; \
-     ${_WDT}/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libv4l-dev" "" "--enable-libv4l2" && \
+     ${_WDT}/_apt_install.sh "ffmpeg" libpulse-dev "" --enable-libpulse && \
+     ${_WDT}/_apt_install.sh "ffmpeg" libjack-dev "" --enable-libjack && \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libdc1394-dev libraw1394-dev" "" --enable-libdc1394 && \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libavc1394-dev libiec61883-dev" "" --enable-libiec61883 && \
+     ${_WDT}/_apt_install.sh "ffmpeg" "libcdio-dev libcdparanoia-dev libcdio-cdda-dev libcdio-paranoia-dev libcdio-utils" "" --enable-libcdio && \
      ${_WDT}/_apt_install.sh "ffmpeg" "libopenal-dev libopenal-data" "" "--enable-openal" \
-    ) || true
+    )
 
 #
 RUN (\
-     ${_WDT}/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl ; \
+     ${_WDT}/_apt_install.sh "ffmpeg" ocl-icd-opencl-dev "" --enable-opencl && \
      ${_WDT}/_apt_install.sh "ffmpeg" nvidia-opencl-dev "" --enable-opencl \
-    ) || true
+    )
 
 #
 RUN (\
@@ -361,12 +361,12 @@ ENV FREI0R_PATH=/usr/lib/frei0r-1
 
 # The LADSPA plug-in that follows is not essential, so simply ignore the error.
 RUN (\
-     ${_WDT}/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa ; \
-     apt-get install ${__APT_Y} csladspa || true ; \
-     apt-get install ${__APT_Y} bs2b-ladspa || true ; \
-     apt-get install ${__APT_Y} guitarix-ladspa || true ; \
-     apt-get install ${__APT_Y} invada-studio-plugins-ladspa || true ; \
-     apt-get install ${__APT_Y} rubberband-ladspa || true \
+     ${_WDT}/_apt_install.sh "ffmpeg" ladspa-sdk "" --enable-ladspa && (\
+         apt-get install ${__APT_Y} csladspa || true ; \
+         apt-get install ${__APT_Y} bs2b-ladspa || true ; \
+         apt-get install ${__APT_Y} guitarix-ladspa || true ; \
+         apt-get install ${__APT_Y} invada-studio-plugins-ladspa || true ; \
+         apt-get install ${__APT_Y} rubberband-ladspa || true) \
     )
 # Environment variable for /usr/bin/listplugins, etc.
 ENV LADSPA_PATH=/usr/lib/ladspa
