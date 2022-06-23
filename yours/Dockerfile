@@ -410,20 +410,22 @@ ENV LADSPA_PATH=/usr/lib/ladspa
 WORKDIR /tmp/build
 
 RUN (\
-     wget -q https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
-         tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -f v${_AVISYNTHPLUS_VERSION}.tar.gz && \
-         mkdir -p AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
-         ${_WDT}/_apt_install.sh "ffmpeg" libdevil-dev "" "" || true ; \
-         (\
-          cd AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
-              cmake -D CMAKE_BUILD_TYPE=RELEASE \
-                    -D BUILD_SHARED_LIBS=ON \
-                    -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
-                    .. && \
-              make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
-              make install && echo ffmpeg:--enable-avisynth >> ${_WDT}/_enable_if_available \
-         ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} \
-    ) || true
+    if grep "^-avisynth$" ${_WDT}/_ffmpeg_cfg_able ; then \
+        wget -q https://github.com/AviSynth/AviSynthPlus/archive/v${_AVISYNTHPLUS_VERSION}.tar.gz && \
+            tar zxf v${_AVISYNTHPLUS_VERSION}.tar.gz && rm -f v${_AVISYNTHPLUS_VERSION}.tar.gz && \
+            mkdir -p AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
+            ${_WDT}/_apt_install.sh "ffmpeg" libdevil-dev "" "" && (\
+                cd AviSynthPlus-${_AVISYNTHPLUS_VERSION}/build && \
+                    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+                          -D BUILD_SHARED_LIBS=ON \
+                          -D CMAKE_INSTALL_PREFIX=${_PREFIX} \
+                          .. && \
+                    make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
+                    make install && echo ffmpeg:--enable-avisynth >> ${_WDT}/_enable_if_available \
+            ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} ; \
+    else true ; \
+    fi ; \
+    )
 
 # ----------------------------------------------------------
 #
