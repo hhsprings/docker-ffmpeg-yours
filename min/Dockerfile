@@ -60,14 +60,14 @@ RUN chmod u+x /tmp/build/_apt_install.sh
 # the execution of the final FFMPEG other than the banner output.
 # ----------------------------------------------------------
 RUN (\
-     /tmp/build/_apt_install.sh "ffmpeg" zlib1g-dev "" --enable-zlib ; \
-     /tmp/build/_apt_install.sh "ffmpeg" liblzma-dev "" --enable-lzma ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libxml2-dev "" --enable-libxml2 ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libass-dev "" --enable-libass ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype ; \
-     /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg ; \
+     /tmp/build/_apt_install.sh "ffmpeg" zlib1g-dev "" --enable-zlib && \
+     /tmp/build/_apt_install.sh "ffmpeg" liblzma-dev "" --enable-lzma && \
+     /tmp/build/_apt_install.sh "ffmpeg" libxml2-dev "" --enable-libxml2 && \
+     /tmp/build/_apt_install.sh "ffmpeg" libass-dev "" --enable-libass && \
+     /tmp/build/_apt_install.sh "ffmpeg" libfribidi-dev "" --enable-libfribidi && \
+     /tmp/build/_apt_install.sh "ffmpeg" libfontconfig-dev libfontconfig1-dev --enable-libfontconfig && \
+     /tmp/build/_apt_install.sh "ffmpeg" libfreetype-dev libfreetype6-dev --enable-libfreetype && \
+     /tmp/build/_apt_install.sh "ffmpeg" libopenjp2-7-dev "" --enable-libopenjpeg && \
      /tmp/build/_apt_install.sh "ffmpeg" libcaca-dev "" --enable-libcaca \
     )
 
@@ -99,10 +99,8 @@ RUN sh configure \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
-    --disable-txtpages
-
-RUN make -j $(grep "^core id" /proc/cpuinfo | wc -l)
-RUN make install
+    --disable-txtpages && \
+    make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install
 
 # ----------------------------------------------------------
 #
