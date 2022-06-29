@@ -437,7 +437,7 @@ WORKDIR ${FFMPEG_SRCDIR}
 RUN (\
      (cd .. ; git clone https://github.com/AOMediaCodec/SVT-AV1.git) ; \
      for p in ../SVT-AV1/ffmpeg_plugin/n`basename \`pwd\` | sed 's@ffmpeg-\(.*\)\.[0-9]*$@\1@'`/*.patch ; \
-     do patch -p1 < "$p" ; done) ; if $? -eq 0 ; then rm -fr SVT-AV1 ; else true ; fi
+     do patch -p1 < "$p" ; done) ; rm -fr ../SVT-AV1 ; true
 
 RUN (\
      sh `head -1 ffbuild/config.log | sed 's@^# @@' | \
