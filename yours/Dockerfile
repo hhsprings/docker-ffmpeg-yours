@@ -42,7 +42,7 @@ RUN (\
     )
 
 # liblensfun
-ARG _LIBLENSFUN_SSVERSION=5604b519fd0ea553655473dee359ee0b4bd0b11b
+ARG _LIBLENSFUN_SSVERSION=7e6a5b59cdb372836e3d34168d4c6cf3955f3ef6
 RUN (\
      if grep "^-liblensfun$" /tmp/build/_ffmpeg_cfg_able ; then \
          wget -q https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
@@ -96,7 +96,7 @@ RUN (\
 # I don't know how popular it is. At least I've never seen a video
 # encoded with this.
 ARG _DAVS2_SSVER=b06d7585620f4e90a6d19a2926bb4e59793b8942
-ARG _UAVS3D_SSVER=04d603d1a27ad924a1a9a02d2893fb3ae1ed67ad
+ARG _UAVS3D_SSVER=15cee5fc8f0b357f5c9fee09a5360d6e7be49027
 RUN (\
      if grep "^-libdavs2$" /tmp/build/_ffmpeg_cfg_able ; then \
          (\
@@ -163,7 +163,7 @@ RUN (\
 
 # libjxl (no DEB package)
 #     NOTE: libjxl depends on libgflags
-ARG _LIBJXL_SSVER=c4262565e8de611f593bf2c6f4a24aeb55d38afb
+ARG _LIBJXL_SSVER=d5ef96e51c39cb96479bfa67f5334c8bb9523166
 RUN (\
      if grep "^-libjxl$" /tmp/build/_ffmpeg_cfg_able ; then \
          apt-get install -yq --no-install-recommends libgflags-dev ; \
