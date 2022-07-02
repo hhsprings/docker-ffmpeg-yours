@@ -450,7 +450,7 @@ RUN (\
         $(grep "^ffmpeg:" ${_WDT}/_enable_if_available | sed 's@^ffmpeg:@@') && \
          make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
          make install && \
-         make alltools ; rm -f tools/*.[od] \
+         make alltools ; _st=$? ; rm -f tools/*.[od] ; exit ${_st} \
     )
 # The "tools" folder contains truly "chunky" tools. Some of them
 # are unrelated to ffmpeg usage and are rather useful only to
