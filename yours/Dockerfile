@@ -260,7 +260,7 @@ RUN (\
               make -j $(grep "^core id" /proc/cpuinfo | wc -l) && make install && \
               echo ffmpeg:--enable-libopencv >> ${_WDT}/_enable_if_available \
          ) ; \
-     rm -fr opencv-${_OPENCV_VERSION} \
+     _st=$? ; rm -fr opencv-${_OPENCV_VERSION} ; exit ${_st} \
     )
 
 # ----------------------------------------------------------
@@ -422,7 +422,7 @@ RUN (\
                           .. && \
                     make -j $(grep "^core id" /proc/cpuinfo | wc -l) && \
                     make install && echo ffmpeg:--enable-avisynth >> ${_WDT}/_enable_if_available \
-            ) ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} ; \
+            ) ; _st=$? ; rm -fr AviSynthPlus-${_AVISYNTHPLUS_VERSION} ; exit ${_st} ; \
     else true ; \
     fi ; \
     )
