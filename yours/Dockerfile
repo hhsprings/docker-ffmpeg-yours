@@ -220,6 +220,7 @@ RUN (\
 #
 # ----------------------------------------------------------
 FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
+ARG _FFMPEG_VERSION=4.4.2
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG _AVISYNTHPLUS_VERSION=3.7.2
