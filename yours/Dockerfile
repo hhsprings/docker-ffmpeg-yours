@@ -220,7 +220,6 @@ RUN (\
 #
 # ----------------------------------------------------------
 FROM hhsprings/ffmpeg-yours-min:latest-${_FFMPEG_VERSION}-${_BUILDPACKDEPS_TAG}
-ARG _OPENCV_VERSION=3.4.16
 ARG _PREFIX=/usr/local
 ARG _FFMPEG_EXTRA_VERSION_SUFFIX=hhsprings0.1
 ARG _AVISYNTHPLUS_VERSION=3.7.2
@@ -245,6 +244,7 @@ RUN ${_WDT}/_apt_install.sh "ffmpeg" libgtk2.0-dev "" ""
 
 # "-D OPENCV_GENERATE_PKGCONFIG=ON" has no effect if opencv 3.x, this is only for opencv 4+.
 RUN (\
+     if test `echo "${_FFMPEG_VERSION}" | awk -F . '{ print $1 }'` = "5" ; then export _OPENCV_VERSION=4.6.0 ; else export _OPENCV_VERSION=3.4.16 ; fi ; \
      wget -q https://github.com/opencv/opencv/archive/refs/tags/${_OPENCV_VERSION}.tar.gz && \
          tar zxf ${_OPENCV_VERSION}.tar.gz && rm -f ${_OPENCV_VERSION}.tar.gz && \
          mkdir -p opencv-${_OPENCV_VERSION}/build && \
