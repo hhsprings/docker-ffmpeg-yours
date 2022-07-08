@@ -42,7 +42,7 @@ RUN (\
     )
 
 # liblensfun
-ARG _LIBLENSFUN_SSVERSION=7e6a5b59cdb372836e3d34168d4c6cf3955f3ef6
+ARG _LIBLENSFUN_SSVERSION=c7ca3c96a8c727b7762578b619e2b0f1a2924ba8
 RUN (\
      if grep "^-liblensfun$" /tmp/build/_ffmpeg_cfg_able ; then \
          wget -q https://github.com/lensfun/lensfun/archive/${_LIBLENSFUN_SSVERSION}.zip && \
@@ -163,7 +163,7 @@ RUN (\
 
 # libjxl (no DEB package)
 #     NOTE: libjxl depends on libgflags
-ARG _LIBJXL_SSVER=d5ef96e51c39cb96479bfa67f5334c8bb9523166
+ARG _LIBJXL_SSVER=0a23d6832a2eef2614016b731e7e1d84ca9c3ff5
 RUN (\
      if grep "^-libjxl$" /tmp/build/_ffmpeg_cfg_able ; then \
          apt-get install -yq --no-install-recommends libgflags-dev ; \
@@ -180,7 +180,7 @@ RUN (\
 
 # libshaderc (no DEB package)
 #     NOTE: libshaderc and libglslang are mutually exclusive
-ARG _LIBSHADERC_SSVER=7e2cfcf2b75c245fa3ceaf2e276180cbf8f107ea
+ARG _LIBSHADERC_SSVER=a0a247d09229669d19b268eb8051eeda880449c1
 RUN (\
      if test "x${_ENABLE_SHADERC}" = "xtrue" && grep "^-libshaderc$" /tmp/build/_ffmpeg_cfg_able ; then \
          apt-get install -yqq --no-install-recommends ninja-build && \
