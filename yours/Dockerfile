@@ -366,7 +366,7 @@ RUN (\
      ${_WDT}/_apt_install.sh "ffmpeg" "libomxil-bellagio-dev libomxil-bellagio-bin" "" "--enable-omx" && \
      if grep "^-libplacebo$" ${_WDT}/_ffmpeg_cfg_able ; then \
          expr `apt-cache policy libplacebo-dev | grep Candidate | awk '{print $2}'` '>=' '4.192.0' && \
-         ${_WDT}/_apt_install.sh "ffmpeg" libplacebo-dev "" --libplacebo ; else true ; fi \
+         ${_WDT}/_apt_install.sh "ffmpeg" libplacebo-dev "" --enable-libplacebo ; else true ; fi \
     )
 
 #
