@@ -3,11 +3,11 @@ export __push=$(if test "z${1:-''}" = "z--push" ; then echo true ; else echo fal
 export _YOU=${_YOU:-hhsprings}
 export _VER_YOURS=0.8.14
 export _BUILDPACKDEPS_TAG_FOR_LATEST=22.10
-export _FFMPEG_VERSION_FOR_LATEST=5.0.1
+export _FFMPEG_VERSION_FOR_LATEST=5.1
 
 cd yours
 for _BUILDPACKDEPS_TAG in 22.10 22.04 ; do
-    for _FFMPEG_VERSION in 5.0.1 4.4.2 ; do
+    for _FFMPEG_VERSION in 5.1 5.0.1 4.4.2 ; do
         docker buildx prune -a -f
 
         export _FFMPEG_EXTRA_VERSION_SUFFIX=${_YOU}${_VER_YOURS}
